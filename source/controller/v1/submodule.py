@@ -35,7 +35,7 @@ def get_module_config_from_github(
     return yaml.load(r.text)
 
 
-def list_modules(org_name="RestBaseApi") -> List[dict]:
+def update_module_list(db_session, org_name="RestBaseApi") -> List[dict]:
     answer = json.loads(
         requests.get(f"https://api.github.com/orgs/{org_name}/repos").text
     )
@@ -53,6 +53,17 @@ def list_modules(org_name="RestBaseApi") -> List[dict]:
         for release in releases_answer:
 
             config = get_config_from_tar(tar_url=release["tarball_url"])
+            db_session.add(
+                Submodule(
+                    name=module_name,
+                    version=release["tag_name"],
+                    functions=extract_function_from_config(config),
+                    min_module_version=config.get("min_version", "NOT_SET"),
+                    release_date=release["published_at"],
+                    files_url=release["tarball_url"],
+                )
+            )
+            db_session.commit()
 
             available_modules.append(
                 {
@@ -83,3 +94,7 @@ def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
 
     os.system(f"rm -r /tmp/tar_tmp")
     return config
+
+
+def extract_function_from_config(config: dict) -> dict:
+    return {}
