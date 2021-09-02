@@ -1,0 +1,5 @@
+# MODULE {{ module_folder }}
+{% for foo_config in functions %}
+from modules.{{module_folder}} import {{ foo_config["function_name"] }} as {{module_folder}}_{{foo_config["block_name"]}}_{{foo_config["essence"]}}
+{% endfor %}
+# ENDMODULE {{ module_folder }}

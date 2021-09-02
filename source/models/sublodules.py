@@ -1,3 +1,4 @@
+from models import Base
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
@@ -5,13 +6,11 @@ from sqlalchemy import Integer
 from sqlalchemy import JSON
 from sqlalchemy import String
 
-from models import Base
-
 
 class Submodule(Base):
     __tablename__ = "submodule"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
     version = Column(String, nullable=False)
     functions = Column(JSON, nullable=False)
@@ -23,7 +22,6 @@ class Submodule(Base):
 class Installation(Base):
     __tablename__ = "installation"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, primary_key=True)
     installation_date = Column(DateTime, nullable=False)
-    submodule_id = Column(Integer, ForeignKey("submodules.id"), nullable=False)
+    submodule_id = Column(Integer, ForeignKey("submodule.id"), nullable=False)

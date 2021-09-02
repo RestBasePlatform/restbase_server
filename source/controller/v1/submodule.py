@@ -1,41 +1,22 @@
 import datetime
-import glob
 import json
 import os
-import shutil
-import tarfile
 from typing import List
 
-import git
 import requests
 import yaml
-from models import Submodule
 from controller.v1.pathdir import extract_data_from_tar
+from models import Submodule
 
 
-def get_link_for_raw_file(link: str) -> str:
-    link = link.replace("/blob", "")
-    return link.replace("github", "raw.githubusercontent")
-
-
-def get_module_config_from_github(
-    repo_link: str, version: str = "stable", version_file="restabse_cfg.yaml"
-) -> dict:
-
-    version_branch_converter = {"stable": "master"}
-
-    file_link = (
-        repo_link.replace("/blob", "").replace("github", "raw.githubusercontent")
-        + "/"
-        + version_branch_converter.get(version, "master")
-        + "/"
-        + version_file
-    )
-    r = requests.get(file_link)
-    return yaml.load(r.text)
-
-
-def update_module_list(db_session, org_name="RestBaseApi") -> List[dict]:
+def update_module_list(db_session, *, full_update: bool = False, org_name="RestBaseApi") -> List[dict]:
+    """
+    Refresh submodules list from github org
+    :param db_session: Database Session
+    :param full_update: Delete old data than update
+    :param org_name: GitHub org name with modules
+    :return:
+    """
     answer = json.loads(
         requests.get(f"https://api.github.com/orgs/{org_name}/repos").text
     )
@@ -43,7 +24,11 @@ def update_module_list(db_session, org_name="RestBaseApi") -> List[dict]:
 
     available_modules = []
 
-    for module_name in module_names[:1]:
+    if full_update:
+        db_session.query(Submodule).delete()
+        db_session.commit()
+
+    for module_name in module_names:
         releases_answer = json.loads(
             requests.get(
                 f"https://api.github.com/repos/RestBaseApi/{module_name}/releases"
@@ -53,16 +38,28 @@ def update_module_list(db_session, org_name="RestBaseApi") -> List[dict]:
         for release in releases_answer:
 
             config = get_config_from_tar(tar_url=release["tarball_url"])
-            db_session.add(
-                Submodule(
-                    name=module_name,
-                    version=release["tag_name"],
-                    functions=extract_function_from_config(config),
-                    min_module_version=config.get("min_version", "NOT_SET"),
-                    release_date=release["published_at"],
-                    files_url=release["tarball_url"],
-                )
+
+            row = (
+                db_session.query(Submodule)
+                .filter_by(id=module_name + release["tag_name"])
+                .first()
             )
+            if not row:
+                db_session.add(
+                    Submodule(
+                        id=module_name + release["tag_name"],
+                        name=module_name,
+                        version=release["tag_name"],
+                        functions=parse_functions_from_config(
+                            config.get("functions", {})
+                        ),
+                        min_module_version=config.get("min_version", "NOT_SET"),
+                        release_date=datetime.datetime.strptime(
+                            release["published_at"], "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                        files_url=release["tarball_url"],
+                    )
+                )
             db_session.commit()
 
             available_modules.append(
@@ -70,7 +67,7 @@ def update_module_list(db_session, org_name="RestBaseApi") -> List[dict]:
                     "module_name": module_name,
                     "version": release["tag_name"],
                     "release_date": release["published_at"],
-                    "config": config
+                    "config": config,
                 }
             )
     return available_modules
@@ -90,11 +87,16 @@ def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
     extract_data_from_tar(tar_path, "/tmp/tar_tmp")
 
     with open("/tmp/tar_tmp/restabse_cfg.yaml") as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.Loader)
 
     os.system(f"rm -r /tmp/tar_tmp")
     return config
 
 
-def extract_function_from_config(config: dict) -> dict:
-    return {}
+def parse_functions_from_config(config_functions_block: dict) -> List[dict]:
+    functions_config = []
+    for module in config_functions_block:
+        for function in config_functions_block.get(module, []):
+            functions_config.append({**function, **{"block_name": module}})
+
+    return functions_config
