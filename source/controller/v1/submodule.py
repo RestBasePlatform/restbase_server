@@ -1,15 +1,16 @@
 import datetime
-import json
 import os
 from typing import List
 
 import requests
 import yaml
 from controller.v1.pathdir import extract_data_from_tar
+from controller.v1.rb_requests import send_request
+from exceptions import SubmoduleNotFound
 from models import Submodule
 
 
-def update_module_list(db_session, *, full_update: bool = False, org_name="RestBaseApi") -> List[dict]:
+async def update_module_list(db_session, *, full_update: bool = False, org_name="RestBaseApi") -> List[dict]:
     """
     Refresh submodules list from github org
     :param db_session: Database Session
@@ -17,9 +18,8 @@ def update_module_list(db_session, *, full_update: bool = False, org_name="RestB
     :param org_name: GitHub org name with modules
     :return:
     """
-    answer = json.loads(
-        requests.get(f"https://api.github.com/orgs/{org_name}/repos").text
-    )
+    answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
+
     module_names = [i["name"] for i in answer if i["name"].endswith("Module")]
 
     available_modules = []
@@ -29,11 +29,7 @@ def update_module_list(db_session, *, full_update: bool = False, org_name="RestB
         db_session.commit()
 
     for module_name in module_names:
-        releases_answer = json.loads(
-            requests.get(
-                f"https://api.github.com/repos/RestBaseApi/{module_name}/releases"
-            ).text
-        )
+        releases_answer = await send_request(f"https://api.github.com/repos/RestBaseApi/{module_name}/releases", "get")
 
         for release in releases_answer:
 
@@ -50,7 +46,7 @@ def update_module_list(db_session, *, full_update: bool = False, org_name="RestB
                         id=module_name + release["tag_name"],
                         name=module_name,
                         version=release["tag_name"],
-                        functions=parse_functions_from_config(
+                        functions=await parse_functions_from_config(
                             config.get("functions", {})
                         ),
                         min_module_version=config.get("min_version", "NOT_SET"),
@@ -93,10 +89,18 @@ def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
     return config
 
 
-def parse_functions_from_config(config_functions_block: dict) -> List[dict]:
+async def parse_functions_from_config(config_functions_block: dict) -> List[dict]:
     functions_config = []
     for module in config_functions_block:
         for function in config_functions_block.get(module, []):
             functions_config.append({**function, **{"block_name": module}})
 
     return functions_config
+
+
+async def get_submodule_data(submodule_name: str, version: str, db_session) -> Submodule:
+    submodule = db_session.query(Submodule).filter_by(id=submodule_name+version).first()
+    if not submodule:
+        raise SubmoduleNotFound(submodule_name+version)
+
+    return submodule

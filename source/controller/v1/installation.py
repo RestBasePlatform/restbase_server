@@ -1,12 +1,14 @@
 import datetime
 import os
 from typing import List
+from typing import Tuple
 
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
 from jinja2 import Template
 from models import Installation
 from models import Submodule
+from exceptions import InstallationNotFound
 
 
 def create_installation(
@@ -69,3 +71,28 @@ def append_imports(
 
     with open("modules/__init__.py", "a") as f:
         f.write(module_block)
+
+
+def delete_installation(
+        installation_name: str, db_session
+):
+
+    if installation_name not in list_installations_names(db_session):
+        raise InstallationNotFound(installation_name)
+
+    db_session.query(Installation).filter_by(name=installation_name).delete()
+    db_session.commit()
+
+    return installation_name
+
+
+def get_installation(
+    installation_name: str, db_session
+) -> Tuple[Installation, Submodule]:
+    if installation_name not in list_installations_names(db_session):
+        raise InstallationNotFound(installation_name)
+
+    installation = db_session.query(Installation).filter_by(name=installation_name).first()
+    submodule = db_session.query(Submodule).filter_by(id=installation.submodule_id).first()
+
+    return installation, submodule
