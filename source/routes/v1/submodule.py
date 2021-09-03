@@ -19,3 +19,9 @@ async def _update_module_list(full_update: bool = False, db_session=Depends(get_
 async def _get_module_data(submodule_name: str, version: str, db_session=Depends(get_db_session)):
     submodule = await get_submodule_data(submodule_name,version, db_session)
     return present_submodule_data(submodule)
+
+
+@submodule_router.get("/list")
+async def _get_module_data(submodule_name: str, version: str, db_session=Depends(get_db_session)):
+    submodule = await get_submodule_data(submodule_name,version, db_session)
+    return present_submodule_data(submodule)
