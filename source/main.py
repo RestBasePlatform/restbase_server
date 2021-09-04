@@ -30,4 +30,4 @@ if __name__ == "__main__":
         # os.environ["SECRET_TOKEN"] = token
         # logger.info(f"Your token: '{token}'")
 
-    uvicorn.run(app, port=8000)
+    uvicorn.run(app, port=8000, host='0.0.0.0')
