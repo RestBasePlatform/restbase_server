@@ -12,4 +12,4 @@ async def send_request(url: str, request_type: str, json_convert: bool = True) -
     """
     async with aiohttp.ClientSession() as session:
         async with getattr(session, request_type)(url) as resp:
-            return resp.json() if json_convert else resp.text()
+            return await resp.json() if json_convert else await resp.text()

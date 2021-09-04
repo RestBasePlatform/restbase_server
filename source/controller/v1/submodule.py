@@ -19,7 +19,6 @@ async def update_module_list(db_session, *, full_update: bool = False, org_name=
     :return:
     """
     answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
-
     module_names = [i["name"] for i in answer if i["name"].endswith("Module")]
 
     available_modules = []
@@ -104,3 +103,7 @@ async def get_submodule_data(submodule_name: str, version: str, db_session) -> S
         raise SubmoduleNotFound(submodule_name+version)
 
     return submodule
+
+
+async def get_submodule_list(db_session) -> List[Submodule]:
+    return [i for i in db_session.query(Submodule).all()]
