@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 from .sublodules import *
-from .secrets import *
+from .secret import *
 
-__all__ = ["Submodule", "Installation", "Secrets"]
+__all__ = ["Submodule", "Installation", "Secret"]
 

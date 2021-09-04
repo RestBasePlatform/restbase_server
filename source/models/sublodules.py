@@ -17,6 +17,7 @@ class Submodule(Base):
     min_module_version = Column(String, nullable=False)
     release_date = Column(DateTime, nullable=False)
     files_url = Column(String, nullable=False)
+    database_type = Column(String)
 
 
 class Installation(Base):
