@@ -11,4 +11,3 @@ class SubmoduleNotFound(Exception):
 class FunctionNotFound(Exception):
     def __init__(self):
         super().__init__()
-

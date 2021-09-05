@@ -1,0 +1,14 @@
+version: 0.1
+min_version: 0.2
+module_name: SomeName
+
+functions:
+    user:
+    - essence: create
+      function_name: create_user
+      kwargs:
+        kwarg_name1: kwarg_description1
+    - essence: delete
+      function_name: delete_user
+      kwargs:
+        kwarg_name2: kwarg_description2

@@ -4,5 +4,6 @@ Base = declarative_base()
 
 from .sublodules import *
 from .secret import *
+from .database import *
 
-__all__ = ["Submodule", "Installation", "Secret"]
+__all__ = ["Submodule", "Installation", "Secret", "DatabaseConnectionData"]

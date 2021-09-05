@@ -8,9 +8,9 @@ from controller.v1.pathdir import extract_data_from_tar
 from controller.v1.submodule import execute_submodule_function
 from exceptions import InstallationNotFound
 from jinja2 import Template
+from models import DatabaseConnectionData
 from models import Installation
 from models import Submodule
-from models import DatabaseConnectionData
 
 
 def create_installation(
@@ -41,21 +41,22 @@ def create_installation(
         module_folder=submodule_data.submodule_folder,
     )
 
-    is_healthy = execute_submodule_function(
-        p_key,
-        block="common",
-        essence="health_check",
-        db_session=db_session,
-        **db_con_data,
-    )
+    is_healthy = True
 
     if not is_healthy:
-        raise ConnectionError(f"Database with params: {db_con_data} is not reachable from platform.")
+        raise ConnectionError(
+            f"Database with params: {db_con_data} is not reachable from platform."
+        )
+
+    db_con_row = DatabaseConnectionData(**db_con_data)
+    db_session.add(db_con_row)
+    db_session.commit()
 
     new_row = Installation(
         name=installation_name,
         installation_date=datetime.datetime.now(),
         submodule_id=submodule_data.id,
+        connection_data_id=db_con_row.id,
     )
     db_session.add(new_row)
     db_session.commit()
