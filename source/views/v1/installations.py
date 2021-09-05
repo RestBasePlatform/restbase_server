@@ -1,12 +1,15 @@
-from models import Installation
-from models import Submodule
-from models import DatabaseConnectionData
-
 from typing import Optional
 
+from models import DatabaseConnectionData
+from models import Installation
+from models import Submodule
 
-def present_installation_data(installation: Installation, submodule: Submodule,
-                              db_con_data: Optional[DatabaseConnectionData]) -> dict:
+
+def present_installation_data(
+    installation: Installation,
+    submodule: Submodule,
+    db_con_data: Optional[DatabaseConnectionData],
+) -> dict:
     answer = {
         "Installation name": installation.name,
         "Installation date": installation.installation_date.strftime(
@@ -16,7 +19,10 @@ def present_installation_data(installation: Installation, submodule: Submodule,
     }
 
     if db_con_data:
-        answer = {**answer, **{"Database server info": db_con_data.get_connection_data()}}
+        answer = {
+            **answer,
+            **{"Database server info": db_con_data.get_connection_data()},
+        }
 
     return answer
 

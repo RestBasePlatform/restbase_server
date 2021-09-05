@@ -1,8 +1,8 @@
 import datetime
 import os
 from typing import List
-from typing import Tuple
 from typing import Optional
+from typing import Tuple
 
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
@@ -118,7 +118,9 @@ async def get_installation(
     db_credentials = None
     if with_credentials:
         db_credentials = (
-            db_session.query(DatabaseConnectionData).filter_by(id=installation.connection_data_id).first()
+            db_session.query(DatabaseConnectionData)
+            .filter_by(id=installation.connection_data_id)
+            .first()
         )
 
     submodule = (

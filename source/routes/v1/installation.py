@@ -50,6 +50,7 @@ async def _get_installation(
     with_credentials: bool,
     db_session=Depends(get_db_session),
 ):
-    installation, submodule, db_con_data = await get_installation(installation_name, with_credentials, db_session)
+    installation, submodule, db_con_data = await get_installation(
+        installation_name, with_credentials, db_session
+    )
     return present_installation_data(installation, submodule, db_con_data)
-
