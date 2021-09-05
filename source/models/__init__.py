@@ -6,4 +6,3 @@ from .sublodules import *
 from .secret import *
 
 __all__ = ["Submodule", "Installation", "Secret"]
-

@@ -5,8 +5,10 @@ from models import Submodule
 def present_installation_data(installation: Installation, submodule: Submodule) -> dict:
     return {
         "Installation name": installation.name,
-        "Installation date": installation.installation_date.strftime("%d-%m-%Y %H:%M:%S"),
-        "Submodule": present_submodule_data(submodule)
+        "Installation date": installation.installation_date.strftime(
+            "%d-%m-%Y %H:%M:%S"
+        ),
+        "Submodule": present_submodule_data(submodule),
     }
 
 

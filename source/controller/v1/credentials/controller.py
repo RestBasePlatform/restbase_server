@@ -1,5 +1,6 @@
+from abc import ABC
+from abc import abstractmethod
 from typing import Optional
-from abc import ABC, abstractmethod
 
 
 class CredentialsController(ABC):
@@ -7,6 +8,7 @@ class CredentialsController(ABC):
     Main class for credentials work.
     All other workers must inherit from this class and implement all methods below.
     """
+
     def __init__(self):
         pass
 

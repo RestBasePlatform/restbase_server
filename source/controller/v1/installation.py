@@ -5,14 +5,20 @@ from typing import Tuple
 
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
+from controller.v1.submodule import execute_submodule_function
+from exceptions import InstallationNotFound
 from jinja2 import Template
 from models import Installation
 from models import Submodule
-from exceptions import InstallationNotFound
+from models import DatabaseConnectionData
 
 
 def create_installation(
-    installation_name: str, submodule_name: str, version: str, db_session
+    installation_name: str,
+    submodule_name: str,
+    version: str,
+    db_session,
+    **db_con_data,
 ):
     """Creates a new installation from scanned submodule"""
 
@@ -26,12 +32,25 @@ def create_installation(
     if not submodule_data:
         pass
 
-    p_key = p_key.replace(".", "_")
     if p_key.replace(".", "_") not in os.listdir("./modules/"):
         tar_path = download_tar(submodule_data.files_url)
-        extract_data_from_tar(tar_path, f"./modules/{p_key}")
+        extract_data_from_tar(tar_path, f"./modules/{submodule_data.submodule_folder}")
 
-    append_imports(functions=submodule_data.functions, module_folder=p_key)
+    append_imports(
+        functions=submodule_data.functions,
+        module_folder=submodule_data.submodule_folder,
+    )
+
+    is_healthy = execute_submodule_function(
+        p_key,
+        block="common",
+        essence="health_check",
+        db_session=db_session,
+        **db_con_data,
+    )
+
+    if not is_healthy:
+        raise ConnectionError(f"Database with params: {db_con_data} is not reachable from platform.")
 
     new_row = Installation(
         name=installation_name,
@@ -73,9 +92,7 @@ def append_imports(
         f.write(module_block)
 
 
-def delete_installation(
-        installation_name: str, db_session
-):
+def delete_installation(installation_name: str, db_session):
 
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
@@ -92,7 +109,11 @@ def get_installation(
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
 
-    installation = db_session.query(Installation).filter_by(name=installation_name).first()
-    submodule = db_session.query(Submodule).filter_by(id=installation.submodule_id).first()
+    installation = (
+        db_session.query(Installation).filter_by(name=installation_name).first()
+    )
+    submodule = (
+        db_session.query(Submodule).filter_by(id=installation.submodule_id).first()
+    )
 
     return installation, submodule

@@ -8,9 +8,12 @@ from controller.v1.pathdir import extract_data_from_tar
 from controller.v1.rb_requests import send_request
 from exceptions import SubmoduleNotFound
 from models import Submodule
+from modules import function_not_found
 
 
-async def update_module_list(db_session, *, full_update: bool = False, org_name="RestBaseApi") -> List[dict]:
+async def update_module_list(
+    db_session, *, full_update: bool = False, org_name="RestBaseApi"
+) -> List[dict]:
     """
     Refresh submodules list from github org
     :param db_session: Database Session
@@ -28,7 +31,9 @@ async def update_module_list(db_session, *, full_update: bool = False, org_name=
         db_session.commit()
 
     for module_name in module_names:
-        releases_answer = await send_request(f"https://api.github.com/repos/RestBaseApi/{module_name}/releases", "get")
+        releases_answer = await send_request(
+            f"https://api.github.com/repos/RestBaseApi/{module_name}/releases", "get"
+        )
 
         for release in releases_answer:
 
@@ -97,13 +102,31 @@ async def parse_functions_from_config(config_functions_block: dict) -> List[dict
     return functions_config
 
 
-async def get_submodule_data(submodule_name: str, version: str, db_session) -> Submodule:
-    submodule = db_session.query(Submodule).filter_by(id=submodule_name+version).first()
+async def get_submodule_data(
+    submodule_name: str, version: str, db_session
+) -> Submodule:
+    submodule = (
+        db_session.query(Submodule).filter_by(id=submodule_name + version).first()
+    )
     if not submodule:
-        raise SubmoduleNotFound(submodule_name+version)
+        raise SubmoduleNotFound(submodule_name + version)
 
     return submodule
 
 
 async def get_submodule_list(db_session) -> List[Submodule]:
     return [i for i in db_session.query(Submodule).all()]
+
+
+def execute_submodule_function(
+    submodule_pkey: str, block: str, essence: str, db_session, **function_kwargs
+):
+    submodule = db_session.query(Submodule).filter_by(id=submodule_pkey).first()
+
+    function_name = submodule.get_function_imported_name(block, essence)
+
+    function_result = getattr(
+        __import__("modules"), "function_name", function_not_found
+    )(**function_kwargs)
+
+    return function_result

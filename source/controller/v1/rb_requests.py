@@ -1,8 +1,11 @@
-import aiohttp
 from typing import Union
 
+import aiohttp
 
-async def send_request(url: str, request_type: str, json_convert: bool = True) -> Union[dict, str]:
+
+async def send_request(
+    url: str, request_type: str, json_convert: bool = True
+) -> Union[dict, str]:
     """
     Wrapper for aiohttp requests
     :param url: url for request

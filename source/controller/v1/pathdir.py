@@ -1,5 +1,4 @@
 """Utils to work with directories and archives"""
-
 import datetime
 import glob
 import hashlib

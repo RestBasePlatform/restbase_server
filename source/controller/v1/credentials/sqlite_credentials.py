@@ -1,17 +1,17 @@
-from .controller import CredentialsController
-from controller.v1.encryption import encrypt_string
-from controller.v1.encryption import decrypt_string
-from models.utils import get_db_session
-from models import Secret
-
 from typing import Optional
+
+from controller.v1.encryption import decrypt_string
+from controller.v1.encryption import encrypt_string
+from models import Secret
+from models.utils import get_db_session
+
+from .controller import CredentialsController
 
 
 class SQLiteController(CredentialsController):
-
     def __init__(self):
         self.db_session = get_db_session()
-        super(SQLiteController, self).__init__()
+        super().__init__()
 
     def put(self, credential_data: str) -> int:
         encrypted_data = encrypt_string(credential_data)

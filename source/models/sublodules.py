@@ -19,6 +19,13 @@ class Submodule(Base):
     files_url = Column(String, nullable=False)
     database_type = Column(String)
 
+    @property
+    def submodule_folder(self):
+        return self.id.replace(".", "_")
+
+    def get_function_imported_name(self, block: str, essence: str) -> str:
+        return f"{self.submodule_folder}_ {block}_{essence}"
+
 
 class Installation(Base):
     __tablename__ = "installation"
@@ -26,3 +33,6 @@ class Installation(Base):
     name = Column(String, nullable=False, primary_key=True)
     installation_date = Column(DateTime, nullable=False)
     submodule_id = Column(Integer, ForeignKey("submodule.id"), nullable=False)
+    connection_data_id = Column(
+        Integer, ForeignKey("database_connection.id"), nullable=False
+    )
