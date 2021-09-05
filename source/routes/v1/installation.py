@@ -47,7 +47,9 @@ async def _list_installations(
 @installation_router.get("/")
 async def _get_installation(
     installation_name: str,
+    with_credentials: bool,
     db_session=Depends(get_db_session),
 ):
-    installation, submodule = get_installation(installation_name, db_session)
-    return present_installation_data(installation, submodule)
+    installation, submodule, db_con_data = await get_installation(installation_name, with_credentials, db_session)
+    return present_installation_data(installation, submodule, db_con_data)
+

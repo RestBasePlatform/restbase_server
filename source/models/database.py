@@ -3,7 +3,6 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import JSON
-from sqlalchemy import String
 
 from . import Base
 
@@ -35,5 +34,12 @@ class DatabaseConnectionData(Base):
             connection_kwargs=con_kwargs,
         )
 
-    def get_connection_data(self):
+    def get_connection_data(self) -> dict:
         cred_controller = get_credentials_controller()
+        return {
+            "username": cred_controller.get(self.username_secret_id),
+            "password": cred_controller.get(self.password_secret_id),
+            "host": cred_controller.get(self.host_secret_id),
+            "port": cred_controller.get(self.port_secret_id),
+            "connection_kwargs": self.connection_kwargs,
+        }

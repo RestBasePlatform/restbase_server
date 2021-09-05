@@ -2,6 +2,7 @@ import datetime
 import os
 from typing import List
 from typing import Tuple
+from typing import Optional
 
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
@@ -104,17 +105,24 @@ def delete_installation(installation_name: str, db_session):
     return installation_name
 
 
-def get_installation(
-    installation_name: str, db_session
-) -> Tuple[Installation, Submodule]:
+async def get_installation(
+    installation_name: str, with_credentials: bool, db_session
+) -> Tuple[Installation, Submodule, Optional[DatabaseConnectionData]]:
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
 
     installation = (
         db_session.query(Installation).filter_by(name=installation_name).first()
     )
+
+    db_credentials = None
+    if with_credentials:
+        db_credentials = (
+            db_session.query(DatabaseConnectionData).filter_by(id=installation.connection_data_id).first()
+        )
+
     submodule = (
         db_session.query(Submodule).filter_by(id=installation.submodule_id).first()
     )
 
-    return installation, submodule
+    return installation, submodule, db_credentials
