@@ -12,7 +12,6 @@ from jinja2 import Template
 from models import DatabaseConnectionData
 from models import Installation
 from models import Submodule
-
 from sqlalchemy.orm import Session
 
 

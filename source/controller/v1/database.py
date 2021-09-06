@@ -1,24 +1,22 @@
 from typing import List
 
 from controller.v1.submodule import execute_submodule_function
-from models import DatabaseConnectionData
-from models import Installation
-from models import Submodule
-from models import DatabaseList
-from models import TableList
-from models import SchemaList
 from models import ColumnList
+from models import DatabaseConnectionData
+from models import DatabaseList
+from models import Installation
+from models import SchemaList
+from models import Submodule
+from models import TableList
 from models.utils import get_pkey_referenced_row
 from restbase_types import DatabaseTable
 from sqlalchemy.orm import Session
 
 
-async def refresh_database_data(
-    installation: Installation, db_session: Session
-):
+async def refresh_database_data(installation: Installation, db_session: Session):
     table_data = await scan_database_for_installation(installation, db_session)
-    for table in table_data:
-        if table.name not in
+    # for table in table_data:
+    #     if table.name not in
 
 
 async def scan_database_for_installation(
