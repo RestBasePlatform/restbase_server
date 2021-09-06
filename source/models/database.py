@@ -43,3 +43,11 @@ class DatabaseConnectionData(Base):
             "port": cred_controller.get(self.port_secret_id),
             "connection_kwargs": self.connection_kwargs,
         }
+
+    def delete_credentials(self):
+        cred_controller = get_credentials_controller()
+        cred_controller.delete(self.host_secret_id)
+        cred_controller.delete(self.port_secret_id)
+        cred_controller.delete(self.username_secret_id)
+        cred_controller.delete(self.port_secret_id)
+        cred_controller.delete(self.password_secret_id)

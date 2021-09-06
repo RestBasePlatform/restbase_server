@@ -12,7 +12,7 @@ from modules import function_not_found
 
 
 async def update_module_list(
-    db_session, *, full_update: bool = False, org_name="RestBaseApi"
+    db_session, *, full_update: bool = False, org_name="RestBasePlatform"
 ) -> List[dict]:
     """
     Refresh submodules list from github org
@@ -22,6 +22,7 @@ async def update_module_list(
     :return:
     """
     answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
+    print(answer)
     module_names = [i["name"] for i in answer if i["name"].endswith("Module")]
 
     available_modules = []
@@ -125,8 +126,8 @@ def execute_submodule_function(
 
     function_name = submodule.get_function_imported_name(block, essence)
 
-    function_result = getattr(
-        __import__("modules"), "function_name", function_not_found
-    )(**function_kwargs)
+    function_result = getattr(__import__("modules"), function_name, function_not_found)(
+        **function_kwargs
+    )
 
     return function_result

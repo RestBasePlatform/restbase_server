@@ -99,7 +99,18 @@ def delete_installation(installation_name: str, db_session):
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
 
-    db_session.query(Installation).filter_by(name=installation_name).delete()
+    installation = (
+        db_session.query(Installation).filter_by(name=installation_name).first()
+    )
+    db_connection_data = (
+        db_session.query(DatabaseConnectionData)
+        .filter_by(id=installation.connection_data_id)
+        .first()
+    )
+    db_connection_data.delete_credentials()
+    db_session.delete(db_connection_data)
+    db_session.delete(installation)
+
     db_session.commit()
 
     return installation_name
@@ -108,6 +119,21 @@ def delete_installation(installation_name: str, db_session):
 async def get_installation(
     installation_name: str, with_credentials: bool, db_session
 ) -> Tuple[Installation, Submodule, Optional[DatabaseConnectionData]]:
+    """Get the installation object data. Include:
+        - submodule data
+        - database connection credentials
+
+    Args:
+        installation_name (str): Installation name from databas
+        with_credentials (bool): Include credentials
+        db_session ([type]): Session for local database
+
+    Raises:
+        InstallationNotFound: If module not found
+
+    Returns:
+        Tuple[Installation, Submodule, Optional[DatabaseConnectionData]]: Database data as SQL ORM objects
+    """
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
 

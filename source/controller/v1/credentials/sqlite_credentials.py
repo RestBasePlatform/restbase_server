@@ -26,3 +26,5 @@ class SQLiteController(CredentialsController):
 
     def delete(self, credential_id: int):
         self.db_session.query(Secret).filter_by(id=credential_id).delete()
+        self.db_session.commit()
+        self.db_session.close()
