@@ -29,8 +29,8 @@ def present_installation_data(
 
 def present_submodule_data(submodule: Submodule) -> dict:
     return {
-        "Submodule Name": submodule.name,
-        "Submodule version": submodule.version,
+        "Name": submodule.name,
+        "Version": submodule.version,
         "Minimal module version": submodule.min_module_version,
         "Released at": submodule.release_date.strftime("%d-%m-%Y %H:%M:%S"),
         "Files URL": submodule.files_url,

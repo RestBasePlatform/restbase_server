@@ -13,15 +13,35 @@ from models import DatabaseConnectionData
 from models import Installation
 from models import Submodule
 
+from sqlalchemy.orm import Session
+
 
 def create_installation(
     installation_name: str,
     submodule_name: str,
     version: str,
-    db_session,
+    db_session: Session,
     **db_con_data,
-):
-    """Creates a new installation from scanned submodule"""
+) -> str:
+    """
+    Create installation from module.
+
+    Parameters
+    ----------
+    installation_name : str
+        Name of installation to create
+    submodule_name : str
+        Name of submodule to work with
+    version : str
+        Version of submodule
+    db_session : Session
+        Sessiom of SQL Alchemy
+
+    Raises
+    ------
+    ConnectionError
+        When database server is unreachable.
+    """
 
     if installation_name in list_installations_names(db_session):
         raise Exception(f"Installation with name {installation_name} already exists.")
@@ -75,12 +95,13 @@ def list_installations_names(db_session) -> List[str]:
 def append_imports(
     import_template_path: str = "templates/import_block.j2", **template_kwargs
 ):
+    """Append new imports to __init__ file in modules.
+
+    Parameters
+    ----------
+    import_template_path : str, optional
+        Path to template with import block, by default "templates/import_block.j2"
     """
-    Append new import to __init__ file in modules directory
-    :param import_template_path: jinja template for import
-    :param template_kwargs: kwargs for template render
-    """
-    # If module already added - just return
     with open("modules/__init__.py") as f:
         if template_kwargs.get("module_folder") in f.read():
             return
@@ -94,7 +115,21 @@ def append_imports(
         f.write(module_block)
 
 
-def delete_installation(installation_name: str, db_session):
+def delete_installation(installation_name: str, db_session: Session):
+    """Delete installation and all relative data
+
+    Parameters
+    ----------
+    installation_name : str
+        Installation name
+    db_session : Session
+        SQL Alchemy Sessin
+
+    Raises
+    ------
+    InstallationNotFound
+        When installation not found.
+    """
 
     if installation_name not in list_installations_names(db_session):
         raise InstallationNotFound(installation_name)
