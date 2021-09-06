@@ -3,6 +3,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import JSON
+from sqlalchemy import String
 
 from . import Base
 
@@ -51,3 +52,40 @@ class DatabaseConnectionData(Base):
         cred_controller.delete(self.username_secret_id)
         cred_controller.delete(self.port_secret_id)
         cred_controller.delete(self.password_secret_id)
+
+
+class DatabaseList(Base):
+
+    __tablename__ = "database_list"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    installation = Column(String, ForeignKey("installation.name"))
+
+
+class SchemaList(Base):
+
+    __tablename__ = "schema_list"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    database = Column(Integer, ForeignKey("database_list.id"))
+
+
+class TableList(Base):
+
+    __tablename__ = "table_list"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    database = Column(Integer, ForeignKey("schema_list.id"))
+
+
+class ColumnList(Base):
+
+    __tablename__ = "column_list"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    datatype = Column(String)
+    database = Column(Integer, ForeignKey("table_list.id"))

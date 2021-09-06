@@ -5,13 +5,14 @@ from models import DatabaseConnectionData
 from models import Installation
 from models import Submodule
 from models.utils import get_pkey_referenced_row
+from restbase_types import DatabaseTable
 from sqlalchemy.orm import Session
 
 
 async def scan_database_for_installation(
     installation: Installation, db_session: Session
-):
-    execute_submodule_function(
+) -> List[DatabaseTable]:
+    tables_list = execute_submodule_function(
         get_pkey_referenced_row(
             installation, "submodule_id", Submodule, db_session, attr_to_get="id"
         ),
@@ -23,6 +24,8 @@ async def scan_database_for_installation(
             "connection_data_id",
             DatabaseConnectionData,
             db_session,
-            function_to_execute="get_connection_data"
-        )
+            function_to_execute="get_connection_data",
+        ),
     )
+
+    return tables_list
