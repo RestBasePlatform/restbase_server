@@ -4,6 +4,8 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+from controller.v1.database import refresh_database_data
+from controller.v1.database import scan_database_for_installation
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
 from controller.v1.submodule import execute_submodule_function
@@ -174,6 +176,8 @@ async def get_installation(
     installation = (
         db_session.query(Installation).filter_by(name=installation_name).first()
     )
+
+    print(await refresh_database_data(installation, db_session))
 
     db_credentials = None
     if with_credentials:

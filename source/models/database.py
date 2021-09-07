@@ -78,7 +78,7 @@ class TableList(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
-    database = Column(Integer, ForeignKey("schema_list.id"))
+    schema = Column(Integer, ForeignKey("schema_list.id"))
 
 
 class ColumnList(Base):
@@ -88,4 +88,4 @@ class ColumnList(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     datatype = Column(String)
-    database = Column(Integer, ForeignKey("table_list.id"))
+    table = Column(Integer, ForeignKey("table_list.id"))

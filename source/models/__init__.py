@@ -6,4 +6,13 @@ from .sublodules import *
 from .secret import *
 from .database import *
 
-__all__ = ["Submodule", "Installation", "Secret", "DatabaseConnectionData"]
+__all__ = [
+    "Submodule",
+    "Installation",
+    "Secret",
+    "DatabaseConnectionData",
+    "TableList",
+    "DatabaseList",
+    "SchemaList",
+    "ColumnList",
+]

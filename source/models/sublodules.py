@@ -24,7 +24,7 @@ class Submodule(Base):
         return self.id.replace(".", "_")
 
     def get_function_imported_name(self, block: str, essence: str) -> str:
-        return f"{self.submodule_folder}_ {block}_{essence}"
+        return f"{self.submodule_folder}_{block}_{essence}"
 
 
 class Installation(Base):
