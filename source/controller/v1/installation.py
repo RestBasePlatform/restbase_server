@@ -5,10 +5,8 @@ from typing import Optional
 from typing import Tuple
 
 from controller.v1.database import refresh_database_data
-from controller.v1.database import scan_database_for_installation
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
-from controller.v1.submodule import execute_submodule_function
 from exceptions import InstallationNotFound
 from jinja2 import Template
 from models import DatabaseConnectionData
@@ -17,7 +15,7 @@ from models import Submodule
 from sqlalchemy.orm import Session
 
 
-def create_installation(
+async def create_installation(
     installation_name: str,
     submodule_name: str,
     version: str,
@@ -36,7 +34,7 @@ def create_installation(
     version : str
         Version of submodule
     db_session : Session
-        Sessiom of SQL Alchemy
+        Session of SQL Alchemy
 
     Raises
     ------
@@ -72,7 +70,6 @@ def create_installation(
 
     db_con_row = DatabaseConnectionData(**db_con_data)
     db_session.add(db_con_row)
-    db_session.commit()
 
     new_row = Installation(
         name=installation_name,
@@ -81,6 +78,9 @@ def create_installation(
         connection_data_id=db_con_row.id,
     )
     db_session.add(new_row)
+
+    await refresh_database_data(new_row, db_session)
+
     db_session.commit()
     return installation_name
 
@@ -176,8 +176,6 @@ async def get_installation(
     installation = (
         db_session.query(Installation).filter_by(name=installation_name).first()
     )
-
-    print(await refresh_database_data(installation, db_session))
 
     db_credentials = None
     if with_credentials:

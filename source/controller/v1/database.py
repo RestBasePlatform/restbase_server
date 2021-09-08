@@ -14,6 +14,15 @@ from sqlalchemy.orm import Session
 
 
 async def refresh_database_data(installation: Installation, db_session: Session):
+    """Refresh database structure data in local database.
+
+    Parameters
+    ----------
+    installation : Installation
+        Object of installation for correct duplicate search.
+    db_session : Session
+        SQLAlchemy ORM session.
+    """
     table_data = await scan_database_for_installation(installation, db_session)
     for table in table_data:
         if not is_table_row_exists(table, installation, db_session):
@@ -31,6 +40,20 @@ async def refresh_database_data(installation: Installation, db_session: Session)
 async def scan_database_for_installation(
     installation: Installation, db_session: Session
 ) -> List[DatabaseTable]:
+    """Executes function in submodule and returns full installation structure.
+
+    Parameters
+    ----------
+    installation : Installation
+        Object of installation to scan.
+    db_session : Session
+        SQLAlchemy ORM session.
+
+    Returns
+    -------
+    List[DatabaseTable]
+        List of full tables data from database.
+    """
     tables_list = await execute_submodule_function(
         get_pkey_referenced_row(
             installation, "submodule_id", Submodule, db_session, attr_to_get="id"
@@ -52,7 +75,23 @@ async def scan_database_for_installation(
 
 def is_table_row_exists(
     _table: DatabaseTable, installation: Installation, db_session: Session
-):
+) -> bool:
+    """Check if table was already added in local database.
+
+    Parameters
+    ----------
+    _table : DatabaseTable
+        Object get after database scan.
+    installation : Installation
+        Object of installation for correct duplicate search.
+    db_session : Session
+        SQLAlchemy ORM session.
+
+    Returns
+    -------
+    [bool]
+        Is table from same installation/database/schema already exists in local database.
+    """
     for exist_table in get_full_table_data_list(installation.name, db_session):
         if (_table.name == exist_table["table_name"]) and (
             _table.schema.name == exist_table["schema_name"]
@@ -62,7 +101,22 @@ def is_table_row_exists(
     return False
 
 
-def get_full_table_data_list(installation_name: str, db_session: Session):
+def get_full_table_data_list(installation_name: str, db_session: Session) -> List[dict]:
+    """Extract full current database structure for installation from local database.
+
+    Parameters
+    ----------
+    installation_name : str
+        Installation name.
+    db_session : Session
+        SQLAlchemy ORM session.
+
+    Returns
+    -------
+    List[dict]
+        List of dictionary with database.
+        Dict loooks like: {"table_name": "name", "schema_name": "name", "database_name": "name"}
+    """
     with open("templates/get_table_data_request.sql") as f:
         request = f.read()
         request = request.replace("INSTALLATION_NAME", installation_name)

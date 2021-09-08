@@ -18,7 +18,7 @@ async def _create_installation(
     body: CreateInstallationModel,
     db_session=Depends(get_db_session),
 ):
-    create_installation(
+    await create_installation(
         body.installation_name,
         body.submodule_name,
         body.submodule_version,
