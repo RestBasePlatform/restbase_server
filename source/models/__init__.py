@@ -5,6 +5,7 @@ Base = declarative_base()
 from .sublodules import *
 from .secret import *
 from .database import *
+from .users import *
 
 __all__ = [
     "Submodule",
@@ -15,4 +16,6 @@ __all__ = [
     "DatabaseList",
     "SchemaList",
     "ColumnList",
+    "Users",
+    "Groups",
 ]

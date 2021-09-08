@@ -125,7 +125,6 @@ async def execute_submodule_function(
     submodule = db_session.query(Submodule).filter_by(id=submodule_pkey).first()
 
     function_name = submodule.get_function_imported_name(block, essence)
-
     function_result = await getattr(
         __import__("modules"), function_name, function_not_found
     )(**function_kwargs)

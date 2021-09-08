@@ -70,7 +70,7 @@ async def create_installation(
 
     db_con_row = DatabaseConnectionData(**db_con_data)
     db_session.add(db_con_row)
-
+    db_session.commit()
     new_row = Installation(
         name=installation_name,
         installation_date=datetime.datetime.now(),
@@ -78,10 +78,9 @@ async def create_installation(
         connection_data_id=db_con_row.id,
     )
     db_session.add(new_row)
-
+    db_session.commit()
     await refresh_database_data(new_row, db_session)
 
-    db_session.commit()
     return installation_name
 
 
