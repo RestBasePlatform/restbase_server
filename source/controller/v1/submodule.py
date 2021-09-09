@@ -91,7 +91,7 @@ def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
     with open("/tmp/tar_tmp/restabse_cfg.yaml") as f:
         config = yaml.load(f, Loader=yaml.Loader)
 
-    os.system(f"rm -r /tmp/tar_tmp")
+    os.system("rm -r /tmp/tar_tmp")
     return config
 
 

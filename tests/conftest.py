@@ -10,7 +10,7 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../source/"))
 )
 
-from main import app
+from main import app  # noqa: E402
 
 
 def pytest_sessionstart():
