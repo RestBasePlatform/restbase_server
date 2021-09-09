@@ -21,3 +21,8 @@ class AlreadyExistsError(Exception):
 class GroupNotFoundError(Exception):
     def __init__(self, identifier: str, identifier_value: str):
         super().__init__(f"Group with '{identifier}'='{identifier_value}' not found.")
+
+
+class UserNotFoundError(Exception):
+    def __init__(self, identifier: str, identifier_value: int):
+        super().__init__(f"User with '{identifier}'='{identifier_value}' not found.")

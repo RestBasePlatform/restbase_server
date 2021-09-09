@@ -1,4 +1,5 @@
 from controller.v1.credentials import get_credentials_controller
+from restbase_types import UserData
 from sqlalchemy import ARRAY
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -31,6 +32,13 @@ class Users(Base):
             password_secret_id=password_secret_id,
             comment=comment,
         )
+
+    def get_user_data(self) -> UserData:
+        cred_controller = get_credentials_controller()
+        username = cred_controller.get(self.username_secret_id)
+        password = cred_controller.get(self.password_secret_id)
+
+        return UserData(username=username, password=password)
 
 
 class Groups(Base):

@@ -52,7 +52,7 @@ async def scan_database_for_installation(
     Returns
     -------
     List[DatabaseTable]
-        List of full tables data from database.
+        List of full config data from database.
     """
     tables_list = await execute_submodule_function(
         get_pkey_referenced_row(
