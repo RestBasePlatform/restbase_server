@@ -1,6 +1,4 @@
 from typing import List
-from typing import Optional
-from typing import Tuple
 from typing import Union
 
 from controller.v1.submodule import execute_submodule_function
@@ -13,8 +11,6 @@ from models import Groups
 from models import Installation
 from models import Users
 from models.utils import get_pkey_referenced_row
-from restbase_types import DatabaseConnectionData
-from restbase_types import UserData
 from sqlalchemy.orm import Session
 
 

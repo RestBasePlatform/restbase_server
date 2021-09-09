@@ -15,14 +15,13 @@ config.set_main_option("sqlalchemy.url", "sqlite:///source/database.db")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-import sys
-import os
+import sys  # noqa: E402
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../source/"))
 )
 
-import models
+import models  # noqa: E402
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -1,6 +1,5 @@
 from controller.v1.credentials import get_credentials_controller
 from restbase_types import UserData
-from sqlalchemy import ARRAY
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
