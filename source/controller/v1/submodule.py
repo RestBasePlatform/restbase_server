@@ -3,6 +3,7 @@ import os
 from typing import List
 
 import requests
+from sqlalchemy.orm.session import Session
 import yaml
 from controller.v1.pathdir import extract_data_from_tar
 from controller.v1.rb_requests import send_request
@@ -120,8 +121,26 @@ async def get_submodule_list(db_session) -> List[Submodule]:
 
 
 async def execute_submodule_function(
-    submodule_pkey: str, block: str, essence: str, db_session, **function_kwargs
+    submodule_pkey: str, block: str, essence: str, db_session: Session, **function_kwargs
 ):
+    """Call a function from submodule that installation based on.
+
+    Parameters
+    ----------
+    submodule_pkey : str
+        Primary key to get submodule functions info.
+    block : str
+        Block name from submodule config.
+    essence : str
+        Function in block in submodule config.
+    db_session : Session
+        SQL AlchemyORM session.
+
+    Returns
+    -------
+    [Any]
+        Result returned by submodule function.
+    """
     submodule = db_session.query(Submodule).filter_by(id=submodule_pkey).first()
 
     function_name = submodule.get_function_imported_name(block, essence)
