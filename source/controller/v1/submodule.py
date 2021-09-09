@@ -3,13 +3,13 @@ import os
 from typing import List
 
 import requests
-from sqlalchemy.orm.session import Session
 import yaml
 from controller.v1.pathdir import extract_data_from_tar
 from controller.v1.rb_requests import send_request
 from exceptions import SubmoduleNotFound
 from models import Submodule
 from modules import function_not_found
+from sqlalchemy.orm.session import Session
 
 
 async def update_module_list(
@@ -121,7 +121,11 @@ async def get_submodule_list(db_session) -> List[Submodule]:
 
 
 async def execute_submodule_function(
-    submodule_pkey: str, block: str, essence: str, db_session: Session, **function_kwargs
+    submodule_pkey: str,
+    block: str,
+    essence: str,
+    db_session: Session,
+    **function_kwargs,
 ):
     """Call a function from submodule that installation based on.
 
