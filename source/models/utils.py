@@ -61,6 +61,11 @@ def initialize_data_in_tables(db_session: Session, *, cfg_path="./config/"):
             data = yaml.load(f.read())
 
             for row in data:
-                db_obj = getattr(__import__("models"), filename)(**row)
+                db_class = getattr(__import__("models"), filename)
+                exist_row =db_session.query(db_class).filter_by(id=row['id'])
+                if exist_row:
+                    exist_row.delete()
+                    db_session.commit()
+                db_obj = db_class(**row)
                 db_session.add(db_obj)
                 db_session.commit()
