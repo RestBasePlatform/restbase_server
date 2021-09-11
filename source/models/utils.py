@@ -55,6 +55,16 @@ def get_pkey_referenced_row(
 
 
 def initialize_data_in_tables(db_session: Session, *, cfg_path="./config/"):
+    """Fill database tables with data from config folder.
+
+    Parameters
+    ----------
+    db_session : Session
+        SQLAlchemy ORM session
+    cfg_path : str, optional
+        Path to folder with yaml configs, by default "./config/"
+    """
+    
     for file in os.listdir(cfg_path):
         filename = file.split(".")[0]
         with open(cfg_path + file) as f:
