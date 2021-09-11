@@ -21,6 +21,10 @@ async def create_user(
     db_session: Session,
     comment: str,
 ) -> int:
+
+    if username in [i.get_user_data().username for i in db_session.query(User).all()]:
+        raise AlreadyExistsError("User", username)
+
     user = User(username=username, password=password, comment=comment)
     db_session.add(user)
     db_session.commit()
@@ -108,3 +112,9 @@ async def inject_user_in_installation(
             **db_connection_row.get_connection_data()
         ),
     )
+
+
+def get_user_id_by_username(username: str, db_session: Session) -> int:
+    for user in db_session.query(User).all():
+        if username == user.get_user_data().username:
+            return user.id

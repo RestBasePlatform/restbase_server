@@ -4,6 +4,7 @@ from controller.v1.installation import get_installation
 from controller.v1.installation import list_installations_names
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import HTTPException
 from models.utils import get_db_session
 from views.v1.installations import present_installation_data
 
@@ -18,14 +19,17 @@ async def _create_installation(
     body: CreateInstallationModel,
     db_session=Depends(get_db_session),
 ):
-    await create_installation(
-        body.installation_name,
-        body.submodule_name,
-        body.submodule_version,
-        db_session,
-        **body.get_db_con_data()
-    )
-    return 200
+    try:
+        await create_installation(
+            body.installation_name,
+            body.submodule_name,
+            body.submodule_version,
+            db_session,
+            **body.get_db_con_data()
+        )
+        return 200
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
 
 
 @installation_router.delete("/")
