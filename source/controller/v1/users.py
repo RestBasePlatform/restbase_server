@@ -7,9 +7,9 @@ from exceptions import GroupNotFoundError
 from exceptions import InstallationNotFound
 from exceptions import UserNotFoundError
 from models import DatabaseConnectionData
-from models import Groups
+from models import Group
 from models import Installation
-from models import Users
+from models import User
 from models.utils import get_pkey_referenced_row
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,7 @@ async def create_user(
     db_session: Session,
     comment: str,
 ) -> int:
-    user = Users(username=username, password=password, comment=comment)
+    user = User(username=username, password=password, comment=comment)
     db_session.add(user)
     db_session.commit()
 
@@ -36,11 +36,11 @@ async def create_group(
     user_list: List[int],
     db_session: Session,
     comment: str,
-) -> Groups:
+) -> Group:
     if name in await get_group_names(db_session):
         raise AlreadyExistsError("Group", name)
 
-    group = Groups(name=name, user_list="", comment=comment)
+    group = Group(name=name, user_list="", comment=comment)
     db_session.add(group)
     db_session.commit()
 
@@ -61,7 +61,7 @@ async def add_user_to_group(
     identifier_value: Union[str, int],
     db_session: Session,
 ):
-    group = db_session.query(Groups).filter_by(**{identifier: identifier_value}).first()
+    group = db_session.query(Group).filter_by(**{identifier: identifier_value}).first()
 
     if not group:
         raise GroupNotFoundError(identifier, identifier_value)
@@ -73,11 +73,11 @@ async def add_user_to_group(
 
 
 async def get_group_names(db_session: Session) -> List[str]:
-    return [i.name for i in db_session.query(Groups).all()]
+    return [i.name for i in db_session.query(Group).all()]
 
 
 async def get_user_ids(db_session: Session) -> List[int]:
-    return [i.id for i in db_session.query(Users).all()]
+    return [i.id for i in db_session.query(User).all()]
 
 
 async def inject_user_in_installation(
@@ -90,7 +90,7 @@ async def inject_user_in_installation(
     if not installation:
         raise InstallationNotFound(installation_name)
 
-    user = db_session.query(Users).filter_by(id=user_id).first()
+    user = db_session.query(User).filter_by(id=user_id).first()
 
     if not user:
         raise UserNotFoundError("id", user_id)

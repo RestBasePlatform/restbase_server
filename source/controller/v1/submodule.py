@@ -22,7 +22,11 @@ async def update_module_list(
     :param org_name: GitHub org name with modules
     """
     answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
-    module_names = [i["name"] for i in answer if i["name"].endswith("Module") and "Postgres" not in i['name']]
+    module_names = [
+        i["name"]
+        for i in answer
+        if i["name"].endswith("Module") and "Postgres" not in i["name"]
+    ]
 
     available_modules = []
 

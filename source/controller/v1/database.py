@@ -179,3 +179,82 @@ async def create_column_row(
         db_session.add(row)
         db_session.commit()
     return row.id
+
+
+async def get_database_object_by_address(
+    installation: Installation,
+    db_session: Session,
+    *,
+    database: str = None,
+    schema: str = None,
+    table: str = None,
+):
+    """Returns SQLAlchemy ORM object with passed address.
+        Returns object if next level is None. Levels order: database->schema->table
+
+    Parameters
+    ----------
+    installation : Installation
+        Installation object to filter database object.
+    db_session : Session
+        SQLAlchemy ORM session.
+    database : str, optional
+        database name
+    schema : str, optional
+        schema name
+    table : str, optional
+        table name
+
+    Returns
+    -------
+    Base
+        SQLAlchemy ORM object with passed address.
+
+    Raises
+    ------
+    ValueError
+        If object with passed name not found in database.
+    """
+    db_object = (
+        db_session.query(DatabaseList)
+        .filter_by(installation=installation.name, name=database)
+        .first()
+    )
+
+    if not db_object:
+        raise ValueError(
+            f"Database with name {database} not found in installation: {installation.name}. "
+            f"Refresh installation and try again."
+        )
+
+    if not schema and not table:
+        return db_object
+
+    schema_object = (
+        db_session.query(SchemaList)
+        .filter_by(database=db_object.id, name=schema)
+        .first()
+    )
+
+    if not schema_object:
+        raise ValueError(
+            f"Schema with name '{schema}' not found in installation: {installation.name}. Database: {database}"
+            f"Refresh installation and try again."
+        )
+
+    if not table:
+        return schema_object
+
+    table_object = (
+        db_session.query(TableList)
+        .filter_by(schema=schema_object.id, name=table)
+        .first()
+    )
+    if not table_object:
+        raise ValueError(
+            f"Table with name '{table}' not found in installation: {installation.name}. Database: {database}. "
+            f"Schema: {schema}"
+            f"Refresh installation and try again."
+        )
+
+    return table_object
