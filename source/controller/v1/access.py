@@ -1,3 +1,4 @@
+from controller.v1.users import get_user_id_by_username
 from exceptions import GroupNotFoundError
 from exceptions import UserNotFoundError
 from models import AccessRule
@@ -6,7 +7,6 @@ from models import Installation
 from sqlalchemy.orm import Session
 
 from .database import get_database_object_by_address
-from controller.v1.users import get_user_id_by_username
 
 
 async def add_access_rule(
@@ -35,19 +35,17 @@ async def grant_access(
 ) -> int:
 
     for k in database_object_address:
-        database_object_address[k.replace('_', '')] = database_object_address[k]
+        database_object_address[k.replace("_", "")] = database_object_address[k]
     print(database_object_address)
-    installation_obj = db_session.query(Installation).filter_by(name=installation_name).first()
+    installation_obj = (
+        db_session.query(Installation).filter_by(name=installation_name).first()
+    )
     granter_orm_object = getattr(__import__("models"), granter_type)
 
     if granter_type == "User":
         granter_id = get_user_id_by_username(granter_name, db_session)
 
-    granter_row = (
-        db_session.query(granter_orm_object)
-        .filter_by(id=granter_id)
-        .first()
-    )
+    granter_row = db_session.query(granter_orm_object).filter_by(id=granter_id).first()
     if not granter_row:
         if granter_type == "User":
             raise UserNotFoundError("id", granter_id)

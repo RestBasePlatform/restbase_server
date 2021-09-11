@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from models.utils import get_db_session
+
 from .schemas import GrantAccessSchema
 
 
@@ -17,8 +18,7 @@ async def _grant_access(body: GrantAccessSchema, db_session=Depends(get_db_sessi
         body.database_address.dict(),
         body.installation_name,
         body.access_string,
-        db_session
+        db_session,
     )
 
     return access_id
-

@@ -51,5 +51,7 @@ class GrantAccessSchema(BaseModel):
     granter_type: str = Field(description="User or Group")
     granter_type_name: str = Field(description="Name of granter")
     installation_name: str
-    database_address: DatabaseAddress = Field(description="Full address of access object")
+    database_address: DatabaseAddress = Field(
+        description="Full address of access object"
+    )
     access_string: str

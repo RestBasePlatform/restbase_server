@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
+from .access import access_router
 from .installation import installation_router
 from .submodule import submodule_router
 from .user_group import group_router
 from .user_group import user_router
-from .access import access_router
 
 
 v1_router = APIRouter(prefix="/v1")

@@ -30,7 +30,9 @@ group_router = APIRouter(prefix="/group", tags=["Groups"])
 @group_router.post("/")
 async def _create_group(group: CreateGroupSchema, db_session=Depends(get_db_session)):
     try:
-        group = await create_group(group.name, group.user_list, db_session, group.comment)
+        group = await create_group(
+            group.name, group.user_list, db_session, group.comment
+        )
         return successful_group_answer(group.id, group.user_list)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
