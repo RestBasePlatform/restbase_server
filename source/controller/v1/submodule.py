@@ -16,15 +16,13 @@ async def update_module_list(
     db_session, *, full_update: bool = False, org_name="RestBasePlatform"
 ) -> List[dict]:
     """
-    Refresh submodules list from github org
+    Refresh submodules list in database from github org
     :param db_session: Database Session
     :param full_update: Delete old data than update
     :param org_name: GitHub org name with modules
-    :return:
     """
     answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
-    print(answer)
-    module_names = [i["name"] for i in answer if i["name"].endswith("Module")]
+    module_names = [i["name"] for i in answer if i["name"].endswith("Module") and "Postgres" not in i['name']]
 
     available_modules = []
 
@@ -38,7 +36,6 @@ async def update_module_list(
         )
 
         for release in releases_answer:
-
             config = get_config_from_tar(tar_url=release["tarball_url"])
 
             row = (
