@@ -43,7 +43,7 @@ class CreateGroupSchema(BaseModel):
 
 class DatabaseAddress(BaseModel):
     database: str = Field(default=None)
-    schema_name: str = Field(default=None, alias='schema')
+    schema_name: str = Field(default=None, alias="schema")
     table: str = Field(default=None)
 
 

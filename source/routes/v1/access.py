@@ -1,7 +1,6 @@
 from controller.v1.access import grant_access
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import HTTPException
 from models.utils import get_db_session
 
 from .schemas import GrantAccessSchema
