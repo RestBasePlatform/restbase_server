@@ -5,7 +5,7 @@ Base = declarative_base()
 from .sublodules import *  # noqa: E402, F403
 from .secret import *  # noqa: E402, F403
 from .database import *  # noqa: E402, F403
-from .users import *  # noqa: E402, F403
+from .user import *  # noqa: E402, F403
 from .access_rule import *  # noqa: E402, F403
 
 __all__ = [  # noqa: F405
@@ -17,8 +17,8 @@ __all__ = [  # noqa: F405
     "DatabaseList",
     "SchemaList",
     "ColumnList",
-    "Users",
-    "Groups",
+    "User",
+    "Group",
     "AccessOwnerType",
     "AccessRule",
     "AccessObjectType",

@@ -1,6 +1,7 @@
 import os
 
 import yaml
+from exceptions import RowNotFoundError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
@@ -64,7 +65,7 @@ def initialize_data_in_tables(db_session: Session, *, cfg_path="./config/"):
     cfg_path : str, optional
         Path to folder with yaml configs, by default "./config/"
     """
-    
+
     for file in os.listdir(cfg_path):
         filename = file.split(".")[0]
         with open(cfg_path + file) as f:
@@ -72,10 +73,18 @@ def initialize_data_in_tables(db_session: Session, *, cfg_path="./config/"):
 
             for row in data:
                 db_class = getattr(__import__("models"), filename)
-                exist_row =db_session.query(db_class).filter_by(id=row['id'])
+                exist_row = db_session.query(db_class).filter_by(id=row["id"])
                 if exist_row:
                     exist_row.delete()
                     db_session.commit()
                 db_obj = db_class(**row)
                 db_session.add(db_obj)
                 db_session.commit()
+
+
+def get_id_by_name(db_object, name: str, db_session: Session) -> int:
+    row = db_session.query(db_object).filter_by(name=name).first()
+    if not row:
+        raise RowNotFoundError(name, db_object.__tablename__)
+
+    return getattr(row, "id", None)

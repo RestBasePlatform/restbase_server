@@ -39,3 +39,19 @@ class CreateGroupSchema(BaseModel):
     user_list: Optional[List[int]] = Field(
         description="User id's for give access to.", default=[]
     )
+
+
+class DatabaseAddress(BaseModel):
+    database: str = Field(default=None)
+    schema_name: str = Field(default=None, alias="schema")
+    table: str = Field(default=None)
+
+
+class GrantAccessSchema(BaseModel):
+    granter_type: str = Field(description="User or Group")
+    granter_type_name: str = Field(description="Name of granter")
+    installation_name: str
+    database_address: Optional[DatabaseAddress] = Field(
+        description="Full address of access object"
+    )
+    access_string: str

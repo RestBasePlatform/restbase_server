@@ -8,8 +8,8 @@ from sqlalchemy import String
 from . import Base
 
 
-class Users(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username_secret_id = Column(Integer, ForeignKey("secret.id"))
@@ -40,8 +40,8 @@ class Users(Base):
         return UserData(username=username, password=password)
 
 
-class Groups(Base):
-    __tablename__ = "groups"
+class Group(Base):
+    __tablename__ = "group"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     user_list = Column(String, nullable=False)
