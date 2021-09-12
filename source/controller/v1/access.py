@@ -34,9 +34,6 @@ async def grant_access(
     db_session: Session,
 ) -> int:
 
-    for k in database_object_address:
-        database_object_address[k.replace("_", "")] = database_object_address[k]
-    print(database_object_address)
     installation_obj = (
         db_session.query(Installation).filter_by(name=installation_name).first()
     )

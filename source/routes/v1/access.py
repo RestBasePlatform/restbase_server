@@ -15,7 +15,7 @@ async def _grant_access(body: GrantAccessSchema, db_session=Depends(get_db_sessi
     access_id = await grant_access(
         body.granter_type_name,
         body.granter_type,
-        body.database_address.dict(),
+        body.database_address.dict(by_alias=True),
         body.installation_name,
         body.access_string,
         db_session,
