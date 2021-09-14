@@ -43,6 +43,6 @@ async def _create_group(group: CreateGroupSchema, db_session=Depends(get_db_sess
 @group_router.get("/")
 async def _list_groups(db_session=Depends(get_db_session)):
     try:
-        return Response(content=await get_group_names(db_session))
+        return {"groups": await get_group_names(db_session)}
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
