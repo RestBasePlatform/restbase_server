@@ -80,6 +80,10 @@ async def get_group_names(db_session: Session) -> List[str]:
     return [i.name for i in db_session.query(Group).all()]
 
 
+async def get_group(group_name: str, db_session: Session) -> Group:
+    return next(db_session.query(Group).filter_by(name=group_name))
+
+
 async def get_user_ids(db_session: Session) -> List[int]:
     return [i.id for i in db_session.query(User).all()]
 

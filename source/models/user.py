@@ -39,6 +39,10 @@ class User(Base):
 
         return UserData(username=username, password=password)
 
+    def get_username(self) -> str:
+        cred_controller = get_credentials_controller()
+        return cred_controller.get(self.username_secret_id)
+
 
 class Group(Base):
     __tablename__ = "group"

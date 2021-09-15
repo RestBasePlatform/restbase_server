@@ -1,11 +1,12 @@
 from controller.v1.users import create_group
 from controller.v1.users import create_user
+from controller.v1.users import get_group
 from controller.v1.users import get_group_names
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Response
 from fastapi import HTTPException
 from models.utils import get_db_session
+from views.v1.user_group import get_group_answer
 from views.v1.user_group import successful_group_answer
 from views.v1.user_group import successful_user_answer
 
@@ -44,5 +45,13 @@ async def _create_group(group: CreateGroupSchema, db_session=Depends(get_db_sess
 async def _list_groups(db_session=Depends(get_db_session)):
     try:
         return {"groups": await get_group_names(db_session)}
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@group_router.get("/{group_name}")
+async def get_group_data(group_name: str, db_session=Depends(get_db_session)):
+    try:
+        return get_group_answer(await get_group(group_name, db_session))
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
