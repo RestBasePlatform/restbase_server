@@ -3,7 +3,6 @@ from typing import List
 
 import yaml
 from exceptions import RowNotFoundError
-from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
@@ -96,6 +95,8 @@ async def get_user_list_names_by_ids(
     user_id_list: List[int], db_session: Session
 ) -> List[str]:
     user_names = []
+    from models.user import User
+
     for u_id in user_id_list:
         user_name = getattr(db_session.query(User).filter_by(id=u_id).first(), "name")
         if user_name:

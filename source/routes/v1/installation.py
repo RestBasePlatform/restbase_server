@@ -41,11 +41,11 @@ async def _delete_installation(
     return 200
 
 
-@installation_router.get("/list")
+@installation_router.get("/GetInstallationsList")
 async def _list_installations(
     db_session=Depends(get_db_session),
 ):
-    return {"available_installations": list_installations_names(db_session)}
+    return list_installations_names(db_session)
 
 
 @installation_router.get("/")

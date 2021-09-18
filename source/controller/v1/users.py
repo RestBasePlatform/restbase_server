@@ -48,7 +48,7 @@ async def create_group(
     db_session.add(group)
     db_session.commit()
 
-    user_id_list = get_user_ids(db_session)
+    user_id_list = await get_user_ids(db_session)
 
     for user in user_list:
         if user in user_id_list:
