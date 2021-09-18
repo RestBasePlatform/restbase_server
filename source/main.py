@@ -3,6 +3,7 @@ import os
 import uvicorn
 from controller.v1.utils import generate_secret_token
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from loguru import logger
 from models.utils import get_db_session
@@ -11,6 +12,14 @@ from routes.v1 import v1_router
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -45,4 +54,4 @@ if __name__ == "__main__":
         os.environ["SECRET_TOKEN"] = token
         logger.info(f"Your token: '{token}'")
 
-    uvicorn.run(app, port=8000, host="0.0.0.0")
+    uvicorn.run(app, port=8000)
