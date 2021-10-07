@@ -1,8 +1,8 @@
-"""initial
+"""Initial
 
-Revision ID: fd4c42e86235
+Revision ID: d0cce8ea75fa
 Revises:
-Create Date: 2021-09-15 10:38:05.103879
+Create Date: 2021-10-07 19:46:10.485928
 
 """
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "fd4c42e86235"
+revision = "d0cce8ea75fa"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -102,6 +102,22 @@ def upgrade():
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
+        "server_credentials",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("username", sa.String(), nullable=True),
+        sa.Column("ssh_key", sa.Integer(), nullable=True),
+        sa.Column("password", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["password"],
+            ["secret.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["ssh_key"],
+            ["secret.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
         "user",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("username_secret_id", sa.Integer(), nullable=True),
@@ -130,6 +146,17 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["submodule_id"],
             ["submodule.id"],
+        ),
+        sa.PrimaryKeyConstraint("name"),
+    )
+    op.create_table(
+        "servers",
+        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("ip", sa.String(), nullable=True),
+        sa.Column("credential_id", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["credential_id"],
+            ["server_credentials.id"],
         ),
         sa.PrimaryKeyConstraint("name"),
     )
@@ -187,8 +214,10 @@ def downgrade():
     op.drop_table("table")
     op.drop_table("schema")
     op.drop_table("database")
+    op.drop_table("servers")
     op.drop_table("installation")
     op.drop_table("user")
+    op.drop_table("server_credentials")
     op.drop_table("database_connection")
     op.drop_table("access_rule")
     op.drop_table("submodule")
