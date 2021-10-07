@@ -38,8 +38,9 @@ async def _get_submodule_names_list(db_session=Depends(get_db_session)):
     return [i.name for i in submodule_list]
 
 
-
 @submodule_router.get("/{submodule_name}/versions")
-async def _get_submodule_versions(submodule_name: str, db_session=Depends(get_db_session)):
+async def _get_submodule_versions(
+    submodule_name: str, db_session=Depends(get_db_session)
+):
     submodule_list = await get_submodule_list(db_session)
     return [i.version for i in submodule_list if i.name == submodule_name]

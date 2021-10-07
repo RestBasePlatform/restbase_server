@@ -1,5 +1,5 @@
 name: Dockerhub
-on: 
+on:
   push:
     branches:
       - dev
@@ -14,7 +14,7 @@ jobs:
         with:
           submodules: recursive
       - name: LS
-        run: ls 
+        run: ls
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"

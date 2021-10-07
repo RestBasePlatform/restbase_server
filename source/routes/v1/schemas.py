@@ -55,3 +55,9 @@ class GrantAccessSchema(BaseModel):
         description="Full address of access object"
     )
     access_string: str
+
+
+class ServerCredentialSchema(BaseModel):
+    username: str = Field(description="Username")
+    ssh_key: str = Field(description="Private SSH Key")
+    password: str = Field(description="Password for key or user")
