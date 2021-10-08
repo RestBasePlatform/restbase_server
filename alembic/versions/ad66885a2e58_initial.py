@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: d0cce8ea75fa
+Revision ID: ad66885a2e58
 Revises:
-Create Date: 2021-10-07 19:46:10.485928
+Create Date: 2021-10-08 11:04:11.768603
 
 """
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "d0cce8ea75fa"
+revision = "ad66885a2e58"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -152,8 +152,11 @@ def upgrade():
     op.create_table(
         "servers",
         sa.Column("name", sa.String(), nullable=False),
-        sa.Column("ip", sa.String(), nullable=True),
+        sa.Column("host", sa.String(), nullable=True),
+        sa.Column("port", sa.Integer(), nullable=True),
         sa.Column("credential_id", sa.Integer(), nullable=True),
+        sa.Column("connection_kwargs", sa.JSON(), nullable=False),
+        sa.Column("server_status", sa.String(), nullable=False),
         sa.ForeignKeyConstraint(
             ["credential_id"],
             ["server_credentials.id"],

@@ -1,9 +1,13 @@
 from controller.v1.credentials import get_credentials_controller
+from exceptions import CredentialsNotFoundError
 from restbase_types.server import ServerConnectionCredentials
+from restbase_types.server import ServerConnectionData
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy import JSON
 from sqlalchemy import String
+from sqlalchemy.orm import Session
 
 from . import Base
 
@@ -11,8 +15,25 @@ from . import Base
 class Servers(Base):
     __tablename__ = "servers"
     name = Column(String, primary_key=True)
-    ip = Column(String)
+    host = Column(String)
+    port = Column(Integer)
     credential_id = Column(Integer, ForeignKey("server_credentials.id"))
+    connection_kwargs = Column(JSON, nullable=False)
+    server_status = Column(String, nullable=False)
+
+    def get_server_connection_data(self, db_session: Session) -> ServerConnectionData:
+        server_credentials = (
+            db_session.query(ServerCredentials).filter_by(id=self.credential_id).first()
+        )
+        if not server_credentials:
+            raise CredentialsNotFoundError("id", self.credential_id)
+
+        return ServerConnectionData(
+            self.host,
+            self.port,
+            self.connection_kwargs,
+            server_credentials.get_server_credentials(),
+        )
 
 
 class ServerCredentials(Base):
