@@ -61,3 +61,13 @@ class ServerCredentialSchema(BaseModel):
     username: str = Field(description="Username")
     ssh_key: str = Field(description="Private SSH Key")
     password: str = Field(description="Password for key or user")
+
+
+class CreateServerSchema(BaseModel):
+    name: str = Field(description="Server name")
+    host: str = Field(description="Server ip address")
+    port: int = Field(description="SSH port of server in 'host'")
+    credential_id: int = Field(description="ID from Server Credentials list")
+    connection_kwargs: dict = Field(
+        description="Additional parameters for server connection", default={}
+    )

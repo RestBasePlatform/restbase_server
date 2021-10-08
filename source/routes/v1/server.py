@@ -1,6 +1,10 @@
+from controller.v1.sshkeys import add_server
 from controller.v1.sshkeys import add_server_credentials
+from controller.v1.sshkeys import delete_server
 from controller.v1.sshkeys import delete_server_credentials
+from controller.v1.sshkeys import list_servers
 from controller.v1.sshkeys import list_ssh_keys
+from controller.v1.sshkeys import update_server
 from controller.v1.sshkeys import update_server_credentials
 from fastapi import APIRouter
 from fastapi import Depends
@@ -8,7 +12,9 @@ from fastapi import Response
 from fastapi.exceptions import HTTPException
 from models.utils import get_db_session
 from views.v1.server import present_server_credential_data
+from views.v1.server import present_server_data
 
+from .schemas import CreateServerSchema
 from .schemas import ServerCredentialSchema
 
 
@@ -56,5 +62,48 @@ async def delete_credentials(
     try:
         await delete_server_credentials(credential_id, db_session)
         return Response(status_code=200, content="Successfully deleted.")
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.post("/")
+async def create_server(
+    request: CreateServerSchema,
+    db_session=Depends(get_db_session),
+):
+    try:
+        server, retry_count = await add_server(request, db_session)
+        return present_server_data(server, db_session, retry_count=retry_count)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.get("/")
+async def _list_servers(
+    db_session=Depends(get_db_session),
+):
+    try:
+        servers = await list_servers(db_session)
+        return [present_server_data(i, db_session) for i in servers]
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.delete("/{name}")
+async def _delete_server(name: str, db_session=Depends(get_db_session)):
+    try:
+        await delete_server(name, db_session)
+        return Response(status_code=200, content="Successfully deleted.")
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.patch("/{name}")
+async def _update_server(
+    name: str, request: CreateServerSchema, db_session=Depends(get_db_session)
+):
+    try:
+        server, retry_count = await update_server(name, request, db_session)
+        return present_server_data(server, db_session, retry_count=retry_count)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
