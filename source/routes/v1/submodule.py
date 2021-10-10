@@ -29,6 +29,7 @@ async def _get_submodule_data(
 @submodule_router.get("/list")
 async def _get_submodule_list(db_session=Depends(get_db_session)):
     submodule_list = await get_submodule_list(db_session)
+    print(submodule_list)
     return [present_submodule_data(i) for i in submodule_list]
 
 

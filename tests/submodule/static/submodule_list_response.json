@@ -1,0 +1,9 @@
+[
+  {
+    "Name": "SomeModule",
+    "Version": "1.0",
+    "Minimal module version": "0.1",
+    "Released at": "01-01-2021 00:00:00",
+    "Files URL": "some-url"
+  }
+]
