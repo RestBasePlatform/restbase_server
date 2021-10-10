@@ -1,11 +1,22 @@
-name: Dockerhub
+name: DeployBranchPipeline
 on:
   push:
     branches:
       - dev
       - test
-      - CICD-16
 jobs:
+   pytest:
+     runs-on: ubuntu-latest
+     steps:
+       -  uses: actions/checkout@v2
+          with:
+            submodules: recursive
+       - name: "Install Requirement"
+         run: |
+          pip3 install -r requirements-dev.txt
+       - name: "Run tests"
+         run: |
+            pytest -v
 
    Dockerhub:
      runs-on: ubuntu-latest
@@ -13,8 +24,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: LS
-        run: ls
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
