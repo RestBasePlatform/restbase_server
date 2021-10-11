@@ -30,4 +30,3 @@ a = requests.post(
         "group_list": [],
     },
 )
-print(a.status_code)
