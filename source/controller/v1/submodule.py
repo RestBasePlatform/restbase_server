@@ -1,5 +1,7 @@
 import datetime
+import importlib
 import os
+import sys
 from typing import List
 
 import requests
@@ -149,6 +151,7 @@ async def execute_submodule_function(
     submodule = db_session.query(Submodule).filter_by(id=submodule_pkey).first()
 
     function_name = submodule.get_function_imported_name(block, essence)
+    importlib.reload(sys.modules["modules"])
     function_result = await getattr(
         __import__("modules"), function_name, function_not_found
     )(**function_kwargs)
