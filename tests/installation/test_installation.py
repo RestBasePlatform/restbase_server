@@ -17,7 +17,7 @@ async def test_create_installation(
 ):
     response = (
         await client_with_submodules.post(
-            "/v1/installation/create", data=create_installation_success_body
+            "/v1/installation/", data=create_installation_success_body
         )
     ).json()
     assert response == create_installation_success_response
@@ -39,12 +39,12 @@ async def test_create_installation_name_already_exists(
 ):
     (
         await client_with_submodules.post(
-            "/v1/installation/create", data=create_installation_success_body
+            "/v1/installation/", data=create_installation_success_body
         )
     ).json()
     response = (
         await client_with_submodules.post(
-            "/v1/installation/create", data=create_installation_success_body
+            "/v1/installation/", data=create_installation_success_body
         )
     ).json()
     assert response == create_installation_name_already_exists_response
