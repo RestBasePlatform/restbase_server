@@ -22,7 +22,7 @@ async def test_update_module_list(
         response = await test_client.post(
             "/v1/submodule/update_module_list", params={"full_update": full_update}
         )
-        print(response)
+        assert response.status_code == 200
         row_id = (
             latest_test_module_config["name"] + latest_test_module_config["version"]
         )
@@ -39,9 +39,7 @@ async def test_update_module_list(
 
 
 @pytest.mark.asyncio
-async def test_get_submodule_list(
-    test_client: AsyncClient, latest_test_module_config: dict
-):
+async def test_get_submodule_list(test_client: AsyncClient):
     with asynctest.patch(
         "routes.v1.submodule.get_submodule_list"
     ) as get_submodule_list_mock:

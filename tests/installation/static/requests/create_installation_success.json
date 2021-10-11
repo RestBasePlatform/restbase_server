@@ -1,0 +1,9 @@
+{
+  "installation_name": "test-1",
+  "submodule_name": "TestModule",
+  "submodule_version": "0.4",
+  "username": "test_user",
+  "password": "test_password",
+  "host": "localhost",
+  "port": "12354"
+}

@@ -20,14 +20,14 @@ async def _create_installation(
     db_session=Depends(get_db_session),
 ):
     try:
-        await create_installation(
+        installation = await create_installation(
             body.installation_name,
             body.submodule_name,
             body.submodule_version,
             db_session,
             **body.get_db_con_data()
         )
-        return 200
+        return {"name": installation.name}
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
 
