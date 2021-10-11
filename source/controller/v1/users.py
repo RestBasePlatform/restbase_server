@@ -122,3 +122,33 @@ def get_user_id_by_username(username: str, db_session: Session) -> int:
     for user in db_session.query(User).all():
         if username == user.get_user_data().username:
             return user.id
+
+
+async def delete_user(user_id: int, db_session: Session):
+    user_row = db_session.query(User).filter_by(id=user_id).first()
+
+    if not user_row:
+        raise UserNotFoundError("id", user_id)
+
+    for group in db_session.query(Group).all():
+        await remove_user_from_group(user_id, group.id, db_session)
+
+    db_session.delete(user_row)
+    db_session.commit()
+
+
+async def remove_user_from_group(user_id: int, group_id: int, db_session: Session):
+    user_row = db_session.query(User).filter_by(id=user_id).first()
+
+    if not user_row:
+        raise UserNotFoundError("id", user_id)
+
+    group_row = db_session.query(Group).filter_by(id=group_id).first()
+
+    if not group_row:
+        raise GroupNotFoundError("id", group_id)
+
+    group_row_user_list = group_row.user_list.split(",")
+    group_row_user_list.remove(user_id)
+    group_row.user_list = ",".join(group_row_user_list)
+    db_session.commit()
