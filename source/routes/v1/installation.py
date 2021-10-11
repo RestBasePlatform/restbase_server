@@ -14,7 +14,7 @@ from .schemas import CreateInstallationModel
 installation_router = APIRouter(prefix="/installation", tags=["Installation"])
 
 
-@installation_router.post("/create")
+@installation_router.post("/")
 async def _create_installation(
     body: CreateInstallationModel,
     db_session=Depends(get_db_session),
@@ -32,7 +32,7 @@ async def _create_installation(
         raise HTTPException(detail=str(e), status_code=400)
 
 
-@installation_router.delete("/")
+@installation_router.delete("/{installation_name}")
 async def _delete_installation(
     installation_name: str,
     db_session=Depends(get_db_session),
@@ -41,14 +41,14 @@ async def _delete_installation(
     return 200
 
 
-@installation_router.get("/GetInstallationsList")
+@installation_router.get("/")
 async def _list_installations(
     db_session=Depends(get_db_session),
 ):
     return list_installations_names(db_session)
 
 
-@installation_router.get("/")
+@installation_router.get("/{installation_name}")
 async def _get_installation(
     installation_name: str,
     with_credentials: bool,

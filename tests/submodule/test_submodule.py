@@ -55,7 +55,7 @@ async def test_get_submodule_list(test_client: AsyncClient):
                 database_type="TestType",
             )
         ]
-        module_list = (await test_client.get("/v1/submodule/list")).json()
+        module_list = (await test_client.get("/v1/submodule/")).json()
         with open("tests/submodule/static/submodule_list_response.json") as f:
             expected_response = json.load(f)
         assert module_list == expected_response

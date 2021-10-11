@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 source/modules/*
 *.db
+.idea/
