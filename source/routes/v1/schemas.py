@@ -33,6 +33,12 @@ class CreateUserSchema(BaseModel):
     )
 
 
+class EditUserSchema(BaseModel):
+    username: str = Field(description="Database username(platform)")
+    password: str = Field(description="Database password(platform)")
+    comment: str = Field(description="User comment(platform)", default="")
+
+
 class CreateGroupSchema(BaseModel):
     name: str = Field(description="Group name(platform)")
     comment: str = Field(description="User comment(platform)", default="")

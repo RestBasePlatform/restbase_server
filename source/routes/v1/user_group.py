@@ -1,6 +1,7 @@
 from controller.v1.users import create_group
 from controller.v1.users import create_user
 from controller.v1.users import delete_user
+from controller.v1.users import edit_user
 from controller.v1.users import get_group
 from controller.v1.users import get_group_names
 from fastapi import APIRouter
@@ -14,6 +15,7 @@ from views.v1.user_group import successful_user_answer
 
 from .schemas import CreateGroupSchema
 from .schemas import CreateUserSchema
+from .schemas import EditUserSchema
 
 user_router = APIRouter(prefix="/user", tags=["Users"])
 
@@ -21,10 +23,19 @@ user_router = APIRouter(prefix="/user", tags=["Users"])
 @user_router.post("/")
 async def _create_user(user: CreateUserSchema, db_session=Depends(get_db_session)):
     try:
-        user_id = await create_user(
-            user.username, user.password, user.group_list, db_session, user.comment
-        )
-        return successful_user_answer(user_id)
+        user = await create_user(user, db_session)
+        return successful_user_answer(user)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@user_router.patch("/{user_id}")
+async def _edit_user(
+    user_id: int, user: EditUserSchema, db_session=Depends(get_db_session)
+):
+    try:
+        user = await edit_user(user_id, user, db_session)
+        return successful_user_answer(user)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
 

@@ -11,28 +11,54 @@ from models import Group
 from models import Installation
 from models import User
 from models.utils import get_pkey_referenced_row
+from routes.v1.schemas import CreateUserSchema
+from routes.v1.schemas import EditUserSchema
 from sqlalchemy.orm import Session
 
 
 async def create_user(
-    username: str,
-    password: str,
-    group_list: List[str],
+    user: CreateUserSchema,
     db_session: Session,
-    comment: str,
-) -> int:
+) -> User:
 
-    if username in [i.get_user_data().username for i in db_session.query(User).all()]:
-        raise AlreadyExistsError("User", username)
+    if user.username in [
+        i.get_user_data().username for i in db_session.query(User).all()
+    ]:
+        raise AlreadyExistsError("User", user.username)
 
-    user = User(username=username, password=password, comment=comment)
-    db_session.add(user)
+    user_row = User(
+        username=user.username, password=user.password, comment=user.comment
+    )
+    db_session.add(user_row)
     db_session.commit()
 
-    for group in group_list:
-        await add_user_to_group(user.id, "id", group, db_session)
+    for group in user.group_list:
+        await add_user_to_group(user_row.id, "id", group, db_session)
 
-    return user.id
+    return user_row
+
+
+async def edit_user(
+    user_id: int,
+    user: EditUserSchema,
+    db_session: Session,
+) -> User:
+
+    user_row = db_session.query(User).filter_by(id=user_id).first()
+
+    if not user_row:
+        raise UserNotFoundError("id", user_id)
+
+    for field in user.dict():
+        if getattr(user, field):
+            if field in ["username", "password"]:
+                user_row.set_secret(field, getattr(user, field))
+            else:
+                setattr(user_row, field, getattr(user, field))
+
+    db_session.commit()
+
+    return user_row
 
 
 async def create_group(

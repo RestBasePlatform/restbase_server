@@ -43,6 +43,10 @@ class User(Base):
         cred_controller = get_credentials_controller()
         return cred_controller.get(self.username_secret_id)
 
+    def set_secret(self, secret_name: str, secret_data: str):
+        cred_controller = get_credentials_controller()
+        setattr(self, secret_name + "_secret_id", cred_controller.put(secret_data))
+
 
 class Group(Base):
     __tablename__ = "group"

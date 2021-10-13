@@ -1,10 +1,14 @@
 from fastapi.responses import JSONResponse
 from models.user import Group
+from models.user import User
 from models.utils import get_user_list_names_by_ids
 
 
-def successful_user_answer(user_id: int):
-    return JSONResponse(content={"id": user_id}, status_code=200)
+def successful_user_answer(user: User):
+    return JSONResponse(
+        content={"id": user.id, "name": user.get_username(), "comment": user.comment},
+        status_code=200,
+    )
 
 
 def successful_group_answer(group_id: int, user_list: str):

@@ -32,3 +32,21 @@ async def test_delete_user(client_with_user: AsyncClient, db_test_session: Sessi
     assert response.status_code == 200
     row = db_test_session.query(User).filter_by(id=1).first()
     assert not row
+
+
+@pytest.mark.asyncio
+async def test_edit_user(
+    client_with_user: AsyncClient,
+    db_test_session: Session,
+    edit_user_success_body: str,
+    edit_user_success_response_response: dict,
+):
+    json_body = json.loads(edit_user_success_body)
+    response = await client_with_user.patch("/v1/user/1", data=edit_user_success_body)
+    assert response.status_code == 200
+    assert response.json() == edit_user_success_response_response
+    row = db_test_session.query(User).filter_by(id=1).first()
+    assert row.id == response.json()["id"]
+    user_data = row.get_user_data()
+    assert user_data.username == json_body["username"]
+    assert user_data.password == json_body["password"]
