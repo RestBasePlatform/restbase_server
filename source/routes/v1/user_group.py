@@ -5,6 +5,7 @@ from controller.v1.users import delete_user
 from controller.v1.users import edit_user
 from controller.v1.users import get_group
 from controller.v1.users import get_group_names
+from controller.v1.users import inject_user_in_installation
 from controller.v1.users import remove_user_from_group
 from fastapi import APIRouter
 from fastapi import Depends
@@ -45,6 +46,17 @@ async def _edit_user(
 async def _delete_user(user_id: int, db_session=Depends(get_db_session)):
     try:
         await delete_user(user_id, db_session)
+        return Response(status_code=200)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@user_router.post("/{user_id}/inject/{installation_name}")
+async def _inject_user_in_installation(
+    user_id: int, installation_name: str, db_session=Depends(get_db_session)
+):
+    try:
+        await inject_user_in_installation(user_id, installation_name, db_session)
         return Response(status_code=200)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)

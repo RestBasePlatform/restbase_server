@@ -1,3 +1,4 @@
+import asynctest
 import pytest
 from httpx import AsyncClient
 from models.user import Group
@@ -30,3 +31,20 @@ async def test_remove_user_from_group(
     assert response.status_code == 200
     group_row = db_test_session.query(Group).filter_by(id=1).first()
     assert not group_row.user_list
+
+
+@pytest.mark.asyncio
+async def test_inject_user_in_installation(
+    client_wit_user_and_installation: AsyncClient,
+    db_test_session: Session,
+):
+    with asynctest.patch(
+        "controller.v1.users.execute_submodule_function"
+    ) as execute_submodule_function_mock:
+        execute_submodule_function_mock.side_effect = [True]
+
+        response = await client_wit_user_and_installation.post(
+            "/v1/user/1/inject/test-1"
+        )
+
+        assert response.status_code == 200

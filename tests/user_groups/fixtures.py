@@ -1,7 +1,10 @@
 import json
 
+import asynctest
 import pytest
 from httpx import AsyncClient
+from installation.fixtures import create_installation_success_body  # noqa: F401
+from mocks import submodule_request_mock
 
 
 @pytest.fixture(scope="session")
@@ -122,3 +125,23 @@ async def client_with_group_with_no_users_and_user(
         print(e)
     finally:
         await client_with_user.aclose()
+
+
+@pytest.fixture(scope="function")
+async def client_wit_user_and_installation(
+    client_with_user: AsyncClient, create_installation_success_body: dict  # noqa: F811
+):
+    with asynctest.patch("controller.v1.submodule.send_request") as send_request_mock:
+        send_request_mock.side_effect = submodule_request_mock
+        await client_with_user.post(
+            "/v1/submodule/update_module_list", params={"full_update": True}
+        )
+        await client_with_user.post(
+            "/v1/installation/", data=create_installation_success_body
+        )
+        try:
+            yield client_with_user
+        except Exception as e:
+            print(e)
+        finally:
+            await client_with_user.aclose()
