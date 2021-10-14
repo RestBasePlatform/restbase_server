@@ -1,10 +1,10 @@
+from controller.v1.users import add_user_to_group
 from controller.v1.users import create_group
 from controller.v1.users import create_user
 from controller.v1.users import delete_user
 from controller.v1.users import edit_user
 from controller.v1.users import get_group
 from controller.v1.users import get_group_names
-from controller.v1.users import add_user_to_group
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -80,7 +80,9 @@ async def get_group_data(group_name: str, db_session=Depends(get_db_session)):
 
 
 @group_router.post("/{group_name}/add_user/{user_id}")
-async def _add_user_to_group(group_name: str, user_id: int, db_session=Depends(get_db_session)):
+async def _add_user_to_group(
+    group_name: str, user_id: int, db_session=Depends(get_db_session)
+):
     try:
         await add_user_to_group(user_id, "name", group_name, db_session)
     except Exception as e:

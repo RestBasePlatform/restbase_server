@@ -65,7 +65,7 @@ async def test_edit_user(
 
 
 @pytest.mark.asyncio
-async def test_delete_user(
+async def test_delete_user_with_group_check(
     client_with_group_with_user_and_user: AsyncClient,
     db_test_session: Session,
 ):
