@@ -27,7 +27,6 @@ async def test_create_installation(
         .filter_by(name=body_dict["installation_name"])
         .first()
     )
-    print(installation_row)
     assert installation_row
 
 

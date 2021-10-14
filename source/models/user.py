@@ -33,15 +33,31 @@ class User(Base):
         )
 
     def get_user_data(self) -> UserData:
+        """Get and decrypt user data.
+
+        Returns
+        -------
+        [UserData]
+            Userdata with decrypted username and password.
+        """
         cred_controller = get_credentials_controller()
         username = cred_controller.get(self.username_secret_id)
         password = cred_controller.get(self.password_secret_id)
 
         return UserData(username=username, password=password)
 
-    def get_username(self) -> str:
+    def set_secret(self, secret_name: str, secret_data: str):
+        """Change username or password.
+
+        Parameters
+        ----------
+        secret_name : str
+            'username' or 'password'
+        secret_data : str
+            New value of secret_name
+        """
         cred_controller = get_credentials_controller()
-        return cred_controller.get(self.username_secret_id)
+        setattr(self, secret_name + "_secret_id", cred_controller.put(secret_data))
 
 
 class Group(Base):
