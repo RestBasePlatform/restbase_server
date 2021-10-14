@@ -99,7 +99,9 @@ async def client_with_group(test_client: AsyncClient, create_user_success_body: 
 
 
 @pytest.fixture(scope="function")
-async def client_with_group_and_user(client_with_user: AsyncClient, create_group_with_users_success_body: dict):
+async def client_with_group_and_user(
+    client_with_user: AsyncClient, create_group_with_users_success_body: dict
+):
     await client_with_user.post("/v1/group/", data=create_group_with_users_success_body)
     try:
         yield client_with_user

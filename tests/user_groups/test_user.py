@@ -2,8 +2,8 @@ import json
 
 import pytest
 from httpx import AsyncClient
-from models.user import User
 from models.user import Group
+from models.user import User
 from sqlalchemy.orm import Session
 from user_groups.fixtures import *  # noqa: F403, F401
 
