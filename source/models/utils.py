@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine(os.getenv("DB_URL", "sqlite:///database.db"))
+engine = create_engine(os.getenv("DB_URL", "sqlite:///database.db"), connect_args={'check_same_thread': False})
 _Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

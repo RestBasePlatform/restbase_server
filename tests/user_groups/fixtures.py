@@ -85,3 +85,25 @@ async def client_with_user(test_client: AsyncClient, create_user_success_body: d
         print(e)
     finally:
         await test_client.aclose()
+
+
+@pytest.fixture(scope="function")
+async def client_with_group(test_client: AsyncClient, create_user_success_body: dict):
+    await test_client.post("/v1/group/", data=create_group_with_users_success_body)
+    try:
+        yield test_client
+    except Exception as e:
+        print(e)
+    finally:
+        await test_client.aclose()
+
+
+@pytest.fixture(scope="function")
+async def client_with_group_and_user(client_with_user: AsyncClient, create_group_with_users_success_body: dict):
+    await client_with_user.post("/v1/group/", data=create_group_with_users_success_body)
+    try:
+        yield client_with_user
+    except Exception as e:
+        print(e)
+    finally:
+        await client_with_user.aclose()

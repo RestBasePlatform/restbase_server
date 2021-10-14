@@ -177,6 +177,6 @@ async def remove_user_from_group(user_id: int, group_id: int, db_session: Sessio
         raise GroupNotFoundError("id", group_id)
 
     group_row_user_list = group_row.user_list.split(",")
-    group_row_user_list.remove(user_id)
+    group_row_user_list.remove(str(user_id))
     group_row.user_list = ",".join(group_row_user_list)
     db_session.commit()
