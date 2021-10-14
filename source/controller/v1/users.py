@@ -80,7 +80,9 @@ async def create_group(
         if user in user_id_list:
             await add_user_to_group(user, "id", group.id, db_session)
         else:
-            UserNotFoundError("id", user)
+            db_session.delete(group)
+            db_session.commit()
+            raise UserNotFoundError("id", user)
 
     return group
 

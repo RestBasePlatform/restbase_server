@@ -10,7 +10,6 @@ from fastapi import HTTPException
 from fastapi import Response
 from models.utils import get_db_session
 from views.v1.user_group import get_group_answer
-from views.v1.user_group import successful_group_answer
 from views.v1.user_group import successful_user_answer
 
 from .schemas import CreateGroupSchema
@@ -58,7 +57,7 @@ async def _create_group(group: CreateGroupSchema, db_session=Depends(get_db_sess
         group = await create_group(
             group.name, group.user_list, db_session, group.comment
         )
-        return successful_group_answer(group.id, group.user_list)
+        return get_group_answer(group)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
 

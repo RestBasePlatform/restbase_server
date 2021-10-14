@@ -4,10 +4,46 @@ import pytest
 from httpx import AsyncClient
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def create_user_success_body():
     with open("tests/user_groups/static/requests/create_user_body.json") as f:
         return f.read()
+
+
+@pytest.fixture(scope="session")
+def create_group_no_users_success_body():
+    with open("tests/user_groups/static/requests/create_group_body_no_users.json") as f:
+        return f.read()
+
+
+@pytest.fixture(scope="session")
+def create_group_no_users_success_response():
+    with open(
+        "tests/user_groups/static/responses/create_group_no_users_response.json"
+    ) as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="session")
+def create_group_with_users_success_body():
+    with open(
+        "tests/user_groups/static/requests/create_group_body_with_users.json"
+    ) as f:
+        return f.read()
+
+
+@pytest.fixture(scope="session")
+def create_group_with_users_success_response():
+    with open("tests/user_groups/static/responses/create_group_with_users.json") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="session")
+def create_group_with_not_exist_users_response():
+    with open(
+        "tests/user_groups/static/responses/create_group_with_not_exist_users.json"
+    ) as f:
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")
@@ -18,7 +54,7 @@ def create_user_success_response_response():
         return json.load(f)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def edit_user_success_body():
     with open("tests/user_groups/static/requests/edit_user_body.json") as f:
         return f.read()
@@ -28,6 +64,14 @@ def edit_user_success_body():
 def edit_user_success_response_response():
     with open(
         "tests/user_groups/static/responses/edit_user_success_response_id_1.json"
+    ) as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="session")
+def create_user_already_exists_error_response():
+    with open(
+        "tests/user_groups/static/responses/create_user_already_exists_error.json"
     ) as f:
         return json.load(f)
 

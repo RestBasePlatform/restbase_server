@@ -27,6 +27,17 @@ async def test_create_user(
 
 
 @pytest.mark.asyncio
+async def test_create_user_already_exists(
+    client_with_user: AsyncClient,
+    create_user_success_body: str,
+    create_user_already_exists_error_response: dict,
+):
+    response = await client_with_user.post("/v1/user/", data=create_user_success_body)
+    assert response.status_code == 400
+    assert response.json() == create_user_already_exists_error_response
+
+
+@pytest.mark.asyncio
 async def test_delete_user(client_with_user: AsyncClient, db_test_session: Session):
     response = await client_with_user.delete("/v1/user/1")
     assert response.status_code == 200
