@@ -20,6 +20,25 @@ async def create_user(
     user: CreateUserSchema,
     db_session: Session,
 ) -> User:
+    """Create user for future inject in database
+
+    Parameters
+    ----------
+    user : CreateUserSchema
+        Object from request body
+    db_session : Session
+        SQL Alchemy ORM Session
+
+    Returns
+    -------
+    User
+        SQL Alchemy ORM User object
+
+    Raises
+    ------
+    AlreadyExistsError
+        If user.username found in database
+    """
 
     if user.username in [
         i.get_user_data().username for i in db_session.query(User).all()
@@ -43,7 +62,27 @@ async def edit_user(
     user: EditUserSchema,
     db_session: Session,
 ) -> User:
+    """Edit user data in database.
 
+    Parameters
+    ----------
+    user_id : int
+        User id in database
+    user : EditUserSchema
+        Object from request body
+    db_session : Session
+        SQL Alchemy ORM Session
+
+    Returns
+    -------
+    User
+        SQL Alchemy ORM User object
+
+    Raises
+    ------
+    UserNotFoundError
+        If user_id not exists in database
+    """
     user_row = db_session.query(User).filter_by(id=user_id).first()
 
     if not user_row:
@@ -93,6 +132,26 @@ async def add_user_to_group(
     identifier_value: Union[str, int],
     db_session: Session,
 ):
+    """Add user to group
+
+    Parameters
+    ----------
+    user_id : int
+        User id in database
+    identifier : str
+        "id" or "name" depends on identifier_value
+    identifier_value : Union[str, int]
+        "id" or "name" depends on identifier
+    db_session : Session
+        SQL Alchemy ORM User object
+
+    Raises
+    ------
+    GroupNotFoundError
+        If identifier_value, identifier of group not exists in database
+    UserNotFoundError
+        If user_id not exists in database
+    """
     group = db_session.query(Group).filter_by(**{identifier: identifier_value}).first()
     user = db_session.query(User).filter_by(id=user_id).first()
 
@@ -122,6 +181,24 @@ async def get_user_ids(db_session: Session) -> List[int]:
 async def inject_user_in_installation(
     user_id: int, installation_name: str, db_session: Session
 ):
+    """Crete user with data from user_id in installation
+
+    Parameters
+    ----------
+    user_id : int
+        User id in database
+    installation_name : str
+        Name of installation
+    db_session : Session
+        SQL Alchemy ORM User object
+
+    Raises
+    ------
+    InstallationNotFound
+        If installation name not exists in database
+    UserNotFoundError
+        If user_id not exists in database
+    """
     installation = (
         db_session.query(Installation).filter_by(name=installation_name).first()
     )

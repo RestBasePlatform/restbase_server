@@ -5,7 +5,7 @@ from models.user import User
 
 def successful_user_answer(user: User):
     return JSONResponse(
-        content={"id": user.id, "name": user.get_username(), "comment": user.comment},
+        content={"id": user.id, "name": user.get_user_data().username, "comment": user.comment},
         status_code=200,
     )
 
