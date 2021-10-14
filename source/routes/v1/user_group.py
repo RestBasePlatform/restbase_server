@@ -1,11 +1,11 @@
 from controller.v1.users import add_user_to_group
-from controller.v1.users import remove_user_from_group
 from controller.v1.users import create_group
 from controller.v1.users import create_user
 from controller.v1.users import delete_user
 from controller.v1.users import edit_user
 from controller.v1.users import get_group
 from controller.v1.users import get_group_names
+from controller.v1.users import remove_user_from_group
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -91,7 +91,7 @@ async def _add_user_to_group(
 
 
 @group_router.post("/{group_name}/remove_user/{user_id}")
-async def _add_user_to_group(
+async def _remove_user_from_group(
     group_name: str, user_id: int, db_session=Depends(get_db_session)
 ):
     try:
