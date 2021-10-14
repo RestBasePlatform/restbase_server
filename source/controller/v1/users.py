@@ -94,9 +94,12 @@ async def add_user_to_group(
     db_session: Session,
 ):
     group = db_session.query(Group).filter_by(**{identifier: identifier_value}).first()
+    user = db_session.query(User).filter_by(id=user_id).first()
 
     if not group:
         raise GroupNotFoundError(identifier, identifier_value)
+    if not user:
+        raise UserNotFoundError("id", user_id)
     if group.user_list:
         group.user_list = ",".join(group.user_list.split(",") + [str(user_id)])
     else:

@@ -66,10 +66,10 @@ async def test_edit_user(
 
 @pytest.mark.asyncio
 async def test_delete_user(
-    client_with_group_and_user: AsyncClient,
+    client_with_group_with_user_and_user: AsyncClient,
     db_test_session: Session,
 ):
-    response = await client_with_group_and_user.delete("/v1/user/1")
+    response = await client_with_group_with_user_and_user.delete("/v1/user/1")
     assert response.status_code == 200
     group_row = db_test_session.query(Group).filter_by(id=1).first()
     assert not group_row.user_list
