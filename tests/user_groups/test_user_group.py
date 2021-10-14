@@ -17,3 +17,16 @@ async def test_add_user_to_group(
     group_row = db_test_session.query(Group).filter_by(id=1).first()
     print(group_row.id)
     assert group_row.user_list
+
+
+@pytest.mark.asyncio
+async def test_remove_user_from_group(
+    client_with_group_with_user_and_user: AsyncClient,
+    db_test_session: Session,
+):
+    response = await client_with_group_with_user_and_user.post(
+        "/v1/group/test-group-1/remove_user/1"
+    )
+    assert response.status_code == 200
+    group_row = db_test_session.query(Group).filter_by(id=1).first()
+    assert not group_row.user_list

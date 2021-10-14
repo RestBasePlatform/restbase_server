@@ -162,22 +162,28 @@ async def delete_user(user_id: int, db_session: Session):
         raise UserNotFoundError("id", user_id)
 
     for group in db_session.query(Group).all():
-        await remove_user_from_group(user_id, group.id, db_session)
+        await remove_user_from_group(user_id, "id", group.id, db_session)
 
     db_session.delete(user_row)
     db_session.commit()
 
 
-async def remove_user_from_group(user_id: int, group_id: int, db_session: Session):
+async def remove_user_from_group(
+    user_id: int,
+    identifier: str,
+    identifier_value: Union[str, int],
+    db_session: Session,
+):
+    group = db_session.query(Group).filter_by(**{identifier: identifier_value}).first()
     user_row = db_session.query(User).filter_by(id=user_id).first()
 
     if not user_row:
         raise UserNotFoundError("id", user_id)
 
-    group_row = db_session.query(Group).filter_by(id=group_id).first()
+    if not group:
+        raise GroupNotFoundError(identifier, identifier_value)
 
-    if not group_row:
-        raise GroupNotFoundError("id", group_id)
+    group_row = db_session.query(Group).filter_by(id=group.id).first()
 
     group_row_user_list = group_row.user_list.split(",")
     group_row_user_list.remove(str(user_id))

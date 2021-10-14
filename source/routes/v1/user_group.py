@@ -1,4 +1,5 @@
 from controller.v1.users import add_user_to_group
+from controller.v1.users import remove_user_from_group
 from controller.v1.users import create_group
 from controller.v1.users import create_user
 from controller.v1.users import delete_user
@@ -85,5 +86,15 @@ async def _add_user_to_group(
 ):
     try:
         await add_user_to_group(user_id, "name", group_name, db_session)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@group_router.post("/{group_name}/remove_user/{user_id}")
+async def _add_user_to_group(
+    group_name: str, user_id: int, db_session=Depends(get_db_session)
+):
+    try:
+        await remove_user_from_group(user_id, "name", group_name, db_session)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)
