@@ -42,6 +42,7 @@ class ServerCredentials(Base):
     username = Column(String)
     ssh_key = Column(Integer, ForeignKey("secret.id"), nullable=True)
     password = Column(Integer, ForeignKey("secret.id"), nullable=True)
+    secret_attrs = ["ssh_key", "password"]
 
     def __init__(self, username: str, ssh_key: str, password: str):
         cred_controller = get_credentials_controller()
@@ -54,3 +55,9 @@ class ServerCredentials(Base):
         ssh_key = cred_controller.get(self.ssh_key) if self.ssh_key else None
         password = cred_controller.get(self.password) if self.password else None
         return ServerConnectionCredentials(self.username, ssh_key, password)
+
+    def set_secret_attr(self, attr_name: str, attr_value: str):
+        cred_controller = get_credentials_controller()
+        if attr_name not in self.secret_attrs:
+            raise ValueError(f"Values {attr_name} must be in {self.secret_attrs}")
+        setattr(self, attr_name, cred_controller.put(attr_value))
