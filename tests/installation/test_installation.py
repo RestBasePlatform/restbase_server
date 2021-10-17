@@ -3,7 +3,7 @@ import json
 import asynctest  # noqa: F401
 import pytest
 from httpx import AsyncClient
-from installation.fixtures import *  # noqa: F403, F401
+from installation.conftest import *  # noqa: F403, F401
 from models.sublodules import Installation
 from sqlalchemy.orm import Session
 

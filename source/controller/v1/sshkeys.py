@@ -39,7 +39,10 @@ async def update_server_credentials(
 
     for field in update_data.dict():
         if getattr(update_data, field):
-            setattr(db_row, field, getattr(update_data, field))
+            if field in db_row.secret_attrs:
+                db_row.set_secret_attr(field, getattr(update_data, field))
+            else:
+                setattr(db_row, field, getattr(update_data, field))
 
     db_session.commit()
     return True

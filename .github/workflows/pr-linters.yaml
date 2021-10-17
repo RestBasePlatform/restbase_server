@@ -13,6 +13,21 @@ jobs:
        - name: "Install Requirement"
          run: |
           pip3 install flake8
-       - name: "Run linter"
+          pip3 install black
+       - name: "Run flake"
          run: |
           flake8 ./
+
+
+   black:
+     runs-on: ubuntu-latest
+     steps:
+       -  uses: actions/checkout@v2
+          with:
+            submodules: recursive
+       - name: "Install Requirement"
+         run: |
+          pip3 install black
+       - name: "Run black"
+         run: |
+           black --check ./

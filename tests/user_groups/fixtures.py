@@ -3,7 +3,7 @@ import json
 import asynctest
 import pytest
 from httpx import AsyncClient
-from installation.fixtures import create_installation_success_body  # noqa: F401
+from installation.conftest import create_installation_success_body  # noqa: F401
 from mocks import submodule_request_mock
 
 
