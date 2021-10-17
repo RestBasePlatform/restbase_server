@@ -1,5 +1,8 @@
 from typing import List
+import paramiko
 from typing import Tuple
+import os
+from io import StringIO
 
 from exceptions import AlreadyExistsError
 from exceptions import CredentialsNotFoundError
@@ -67,8 +70,31 @@ async def delete_server_credentials(cred_id: int, db_session: Session) -> bool:
 async def check_server_availability(
     server_connection_data: ServerConnectionData,
 ) -> Tuple[bool, int]:
-    # TODO: RB-91
-    return True, 0
+
+    max_retry_count = os.getenv("MAX_CONNECTION_RETRY", 5)
+    current_retry_count = 0
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    private_key_file = StringIO(server_connection_data.connection_data.ssh_key)
+
+    key = paramiko.RSAKey.from_private_key(private_key_file)
+    while current_retry_count <= max_retry_count:
+        try:
+            client.connect(
+                hostname=server_connection_data.host,
+                port=server_connection_data.port,
+                username=server_connection_data.connection_data.username,
+                password=server_connection_data.connection_data.password,
+                pkey=key,
+            )
+
+            return True, current_retry_count
+        except Exception as e:
+            print(e)
+            current_retry_count += 1
+
+    return False, current_retry_count
 
 
 async def add_server(
