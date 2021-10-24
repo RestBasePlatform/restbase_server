@@ -1,5 +1,6 @@
 from controller.v1.sshkeys import add_server
 from controller.v1.sshkeys import add_server_credentials
+from controller.v1.sshkeys import check_server
 from controller.v1.sshkeys import delete_server
 from controller.v1.sshkeys import delete_server_credentials
 from controller.v1.sshkeys import list_servers
@@ -13,6 +14,7 @@ from fastapi.exceptions import HTTPException
 from models.utils import get_db_session
 from views.v1.server import present_server_credential_data
 from views.v1.server import present_server_data
+from views.v1.server import present_server_health_check_data
 
 from .schemas import CreateServerSchema
 from .schemas import ServerCredentialSchema
@@ -105,5 +107,25 @@ async def _update_server(
     try:
         server, retry_count = await update_server(name, request, db_session)
         return present_server_data(server, db_session, retry_count=retry_count)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.post("/health_check/{name}")
+async def _check_server_by_name(name: str, db_session=Depends(get_db_session)):
+    try:
+        server_status, retry_count = await check_server(db_session, name=name)
+        return present_server_health_check_data(server_status, retry_count)
+    except Exception as e:
+        raise HTTPException(detail=str(e), status_code=400)
+
+
+@server_router.post("/health_check/")
+async def _check_server_by_schema(
+    request: CreateServerSchema, db_session=Depends(get_db_session)
+):
+    try:
+        server_status, retry_count = await check_server(db_session, server_data=request)
+        return present_server_health_check_data(server_status, retry_count)
     except Exception as e:
         raise HTTPException(detail=str(e), status_code=400)

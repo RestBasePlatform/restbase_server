@@ -36,3 +36,7 @@ def present_server_data(
         response = {**response, **{"retry_count": retry_count}}
 
     return response
+
+
+def present_server_health_check_data(status: bool, retry_count: int) -> dict:
+    return {"status": status, "retry_count": retry_count}

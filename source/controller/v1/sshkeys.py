@@ -1,9 +1,9 @@
-from typing import List
-import paramiko
-from typing import Tuple
 import os
 from io import StringIO
+from typing import List
+from typing import Tuple
 
+import paramiko
 from exceptions import AlreadyExistsError
 from exceptions import CredentialsNotFoundError
 from exceptions import ServerNotFoundError
@@ -65,6 +65,32 @@ async def delete_server_credentials(cred_id: int, db_session: Session) -> bool:
     db_session.delete(db_row)
     db_session.commit()
     return True
+
+
+async def check_server(
+    db_session: Session, *, name: str = None, server_data: CreateServerSchema = None
+) -> Tuple[bool, int]:
+    if not (name or server_data):
+        raise ValueError("'name' or 'server_connection_data' must be specified")
+
+    server_connection_data = None
+    if name:
+        server_row = db_session.query(Servers).filter_by(name=name).first()
+        server_connection_data = server_row.get_server_credentials()
+    elif server_data:
+        credentials = (
+            db_session.query(ServerCredentials)
+            .filter_by(id=server_data.credential_id)
+            .first()
+        )
+        server_connection_data = ServerConnectionData(
+            host=server_data.host,
+            port=server_data.port,
+            connection_kwargs=server_data.connection_kwargs,
+            connection_data=credentials,
+        )
+
+    return await check_server_availability(server_connection_data)
 
 
 async def check_server_availability(
