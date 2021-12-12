@@ -56,7 +56,7 @@ class DatabaseConnectionData(Base):
 
 class DatabaseList(Base):
 
-    __tablename__ = "database_list"
+    __tablename__ = "database"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
@@ -65,27 +65,27 @@ class DatabaseList(Base):
 
 class SchemaList(Base):
 
-    __tablename__ = "schema_list"
+    __tablename__ = "schema"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
-    database = Column(Integer, ForeignKey("database_list.id"))
+    database = Column(Integer, ForeignKey("database.id"))
 
 
 class TableList(Base):
 
-    __tablename__ = "table_list"
+    __tablename__ = "table"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
-    schema = Column(Integer, ForeignKey("schema_list.id"))
+    schema = Column(Integer, ForeignKey("schema.id"))
 
 
 class ColumnList(Base):
 
-    __tablename__ = "column_list"
+    __tablename__ = "column"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     datatype = Column(String)
-    table = Column(Integer, ForeignKey("table_list.id"))
+    table = Column(Integer, ForeignKey("table.id"))

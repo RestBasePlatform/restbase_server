@@ -1,30 +1,37 @@
 import datetime
+import importlib
 import os
+import sys
 from typing import List
 
 import requests
-from sqlalchemy.orm.session import Session
 import yaml
+from config import MODULES_PATH
+from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
+from controller.v1.pathdir import extract_data_from_zip
 from controller.v1.rb_requests import send_request
 from exceptions import SubmoduleNotFound
 from models import Submodule
 from modules import function_not_found
+from sqlalchemy.orm.session import Session
 
 
 async def update_module_list(
     db_session, *, full_update: bool = False, org_name="RestBasePlatform"
 ) -> List[dict]:
     """
-    Refresh submodules list from github org
+    Refresh submodules list in database from github org
     :param db_session: Database Session
     :param full_update: Delete old data than update
     :param org_name: GitHub org name with modules
-    :return:
     """
     answer = await send_request(f"https://api.github.com/orgs/{org_name}/repos", "get")
-    print(answer)
-    module_names = [i["name"] for i in answer if i["name"].endswith("Module")]
+    module_names = [
+        i["name"]
+        for i in answer
+        if i["name"].endswith("Module") and "Postgres" not in i["name"]
+    ]
 
     available_modules = []
 
@@ -38,7 +45,6 @@ async def update_module_list(
         )
 
         for release in releases_answer:
-
             config = get_config_from_tar(tar_url=release["tarball_url"])
 
             row = (
@@ -75,7 +81,9 @@ async def update_module_list(
     return available_modules
 
 
-def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
+def get_config_from_tar(
+    *, tar_path: str = None, zip_path: str = None, tar_url: str = None
+) -> dict:
 
     archive_path = "/tmp/archive.tgz"
     if tar_url:
@@ -86,12 +94,15 @@ def get_config_from_tar(*, tar_path: str = None, tar_url: str = None) -> dict:
 
         tar_path = archive_path
 
-    extract_data_from_tar(tar_path, "/tmp/tar_tmp")
+    if tar_path:
+        extract_data_from_tar(tar_path, "/tmp/tar_tmp")
+    elif zip_path:
+        extract_data_from_zip(zip_path, "/tmp/tar_tmp")
 
     with open("/tmp/tar_tmp/restabse_cfg.yaml") as f:
         config = yaml.load(f, Loader=yaml.Loader)
 
-    os.system(f"rm -r /tmp/tar_tmp")
+    os.system("rm -r /tmp/tar_tmp")
     return config
 
 
@@ -121,7 +132,11 @@ async def get_submodule_list(db_session) -> List[Submodule]:
 
 
 async def execute_submodule_function(
-    submodule_pkey: str, block: str, essence: str, db_session: Session, **function_kwargs
+    submodule_pkey: str,
+    block: str,
+    essence: str,
+    db_session: Session,
+    **function_kwargs,
 ):
     """Call a function from submodule that installation based on.
 
@@ -144,8 +159,41 @@ async def execute_submodule_function(
     submodule = db_session.query(Submodule).filter_by(id=submodule_pkey).first()
 
     function_name = submodule.get_function_imported_name(block, essence)
+    importlib.reload(sys.modules["modules"])
     function_result = await getattr(
         __import__("modules"), function_name, function_not_found
     )(**function_kwargs)
 
     return function_result
+
+
+async def add_submodule_by_github_url(
+    module_name: str,
+    tag: str,
+    github_zip_url: str,
+    db_session: Session,
+):
+    tar_path = download_tar(github_zip_url)
+    submodule_config = get_config_from_tar(zip_path=tar_path)
+
+    row = db_session.query(Submodule).filter_by(id=module_name + tag).first()
+    if not row:
+        db_session.add(
+            Submodule(
+                id=module_name + tag,
+                name=module_name,
+                version=tag,
+                functions=await parse_functions_from_config(
+                    submodule_config.get("functions", {})
+                ),
+                min_module_version=submodule_config.get("min_version", "NOT_SET"),
+                release_date=datetime.datetime.now(),
+                files_url=github_zip_url,
+            )
+        )
+    db_session.commit()
+    row = db_session.query(Submodule).filter_by(id=module_name + tag).first()
+    extract_data_from_zip(
+        tar_path,
+        f"{MODULES_PATH}/{row.submodule_folder}",
+    )

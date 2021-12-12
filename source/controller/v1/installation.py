@@ -4,6 +4,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+from config import MODULES_PATH
 from controller.v1.database import refresh_database_data
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
@@ -21,7 +22,7 @@ async def create_installation(
     version: str,
     db_session: Session,
     **db_con_data,
-) -> str:
+) -> Installation:
     """
     Create installation from module.
 
@@ -52,11 +53,13 @@ async def create_installation(
     if not submodule_data:
         pass
 
-    if p_key.replace(".", "_") not in os.listdir("./modules/"):
+    if p_key.replace(".", "_") not in os.listdir(MODULES_PATH):
         tar_path = download_tar(submodule_data.files_url)
-        extract_data_from_tar(tar_path, f"./modules/{submodule_data.submodule_folder}")
+        extract_data_from_tar(
+            tar_path, f"{MODULES_PATH}/{submodule_data.submodule_folder}"
+        )
 
-    append_imports(
+    await append_imports(
         functions=submodule_data.functions,
         module_folder=submodule_data.submodule_folder,
     )
@@ -79,9 +82,14 @@ async def create_installation(
     )
     db_session.add(new_row)
     db_session.commit()
+    # try:
     await refresh_database_data(new_row, db_session)
+    # except BaseException as e:
+    #     print(e)
+    #     db_session.delete(new_row)
+    #     db_session.commit()
 
-    return installation_name
+    return new_row
 
 
 def list_installations(db_session) -> List[Installation]:
@@ -92,7 +100,7 @@ def list_installations_names(db_session) -> List[str]:
     return [i.name for i in list_installations(db_session)]
 
 
-def append_imports(
+async def append_imports(
     import_template_path: str = "templates/import_block.j2", **template_kwargs
 ):
     """Append new imports to __init__ file in modules.
@@ -102,7 +110,7 @@ def append_imports(
     import_template_path : str, optional
         Path to template with import block, by default "templates/import_block.j2"
     """
-    with open("modules/__init__.py") as f:
+    with open(MODULES_PATH + "/__init__.py") as f:
         if template_kwargs.get("module_folder") in f.read():
             return
 
@@ -111,7 +119,7 @@ def append_imports(
 
     module_block = "\n" + template.render(**template_kwargs) + "\n"
 
-    with open("modules/__init__.py", "a") as f:
+    with open(MODULES_PATH + "/__init__.py", "a") as f:
         f.write(module_block)
 
 

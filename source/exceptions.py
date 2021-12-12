@@ -19,10 +19,27 @@ class AlreadyExistsError(Exception):
 
 
 class GroupNotFoundError(Exception):
-    def __init__(self, identifier: str, identifier_value: str):
+    def __init__(self, identifier: str, identifier_value: int):
         super().__init__(f"Group with '{identifier}'='{identifier_value}' not found.")
 
 
 class UserNotFoundError(Exception):
     def __init__(self, identifier: str, identifier_value: int):
         super().__init__(f"User with '{identifier}'='{identifier_value}' not found.")
+
+
+class CredentialsNotFoundError(Exception):
+    def __init__(self, identifier: str, identifier_value: int):
+        super().__init__(
+            f"Credentials with '{identifier}'='{identifier_value}' not found."
+        )
+
+
+class ServerNotFoundError(Exception):
+    def __init__(self, identifier: str, identifier_value: int):
+        super().__init__(f"Server with '{identifier}'='{identifier_value}' not found.")
+
+
+class RowNotFoundError(Exception):
+    def __init__(self, name: str, table_name: str):
+        super().__init__(f"Row with name: '{name}' not found in table '{table_name}'")
