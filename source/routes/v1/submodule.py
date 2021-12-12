@@ -1,11 +1,12 @@
+from controller.v1.submodule import add_submodule_by_github_url
 from controller.v1.submodule import get_submodule_data
 from controller.v1.submodule import get_submodule_list
 from controller.v1.submodule import update_module_list
 from fastapi import APIRouter
 from fastapi import Depends
 from models.utils import get_db_session
+from routes.v1.schemas import AddCustomSubmoduleSchema
 from views.v1.installations import present_submodule_data
-
 
 submodule_router = APIRouter(prefix="/submodule", tags=["Submodule"])
 
@@ -16,6 +17,19 @@ async def _update_submodule_list(
 ):
     await update_module_list(db_session, full_update=full_update)
     return 200
+
+
+@submodule_router.put("/add_submodule_by_github_url")
+async def _add_submodule_by_github_url(
+    body: AddCustomSubmoduleSchema,
+    db_session=Depends(get_db_session),
+):
+    await add_submodule_by_github_url(
+        module_name=body.submodule_name,
+        tag=body.tag,
+        github_zip_url=body.github_url,
+        db_session=db_session,
+    )
 
 
 @submodule_router.get("/{submodule_name}/{version}")

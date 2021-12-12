@@ -3,6 +3,7 @@ from datetime import datetime
 
 import asynctest
 import pytest
+import responses
 from httpx import AsyncClient
 from mocks import submodule_request_mock
 from models.sublodules import Submodule
@@ -59,3 +60,38 @@ async def test_get_submodule_list(test_client: AsyncClient):
         with open("tests/submodule/static/submodule_list_response.json") as f:
             expected_response = json.load(f)
         assert module_list == expected_response
+
+
+@pytest.mark.asyncio
+@responses.activate
+async def test_add_submodule_by_github_url(
+    test_client: AsyncClient,
+    add_submodule_by_github_url_success_body: str,
+    db_test_session: Session,
+):
+    with open("tests/submodule/static/TestModule-master.zip", "rb") as f:
+        responses.add(
+            responses.GET,
+            "https://github.com/RestBasePlatform/TestModule/archive/refs/heads/master.zip",
+            body=f.read(),
+            status=200,
+            stream=True,
+        )
+
+        response = await test_client.put(
+            "/v1/submodule/add_submodule_by_github_url",
+            data=add_submodule_by_github_url_success_body,
+        )
+        add_submodule_by_github_url_success_body = json.loads(
+            add_submodule_by_github_url_success_body
+        )
+        assert response.status_code == 200
+        row_id = (
+            add_submodule_by_github_url_success_body["submodule_name"]
+            + add_submodule_by_github_url_success_body["tag"]
+        )
+        row = db_test_session.query(Submodule).filter_by(id=row_id).first()
+        assert row
+        assert row.name == add_submodule_by_github_url_success_body["submodule_name"]
+        assert row.version == add_submodule_by_github_url_success_body["tag"]
+        assert row.files_url == add_submodule_by_github_url_success_body["github_url"]

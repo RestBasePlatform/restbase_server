@@ -4,6 +4,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+from config import MODULES_PATH
 from controller.v1.database import refresh_database_data
 from controller.v1.pathdir import download_tar
 from controller.v1.pathdir import extract_data_from_tar
@@ -13,9 +14,6 @@ from models import DatabaseConnectionData
 from models import Installation
 from models import Submodule
 from sqlalchemy.orm import Session
-
-
-MODULES_PATH = "modules" if not os.getenv("TEST") else "./source/modules"
 
 
 async def create_installation(
