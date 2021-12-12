@@ -5,6 +5,12 @@ from pydantic import BaseModel
 from pydantic import Field
 
 
+class AddCustomSubmoduleSchema(BaseModel):
+    submodule_name: str = Field(description="Submodule name")
+    tag: str = Field(description="Unique version of submodule name")
+    github_url: str = Field(description="Url for github zip archive")
+
+
 class CreateInstallationModel(BaseModel):
     installation_name: str = Field(description="Installation name")
     submodule_name: str = Field(description="Submodule name")

@@ -18,6 +18,8 @@ from main import app  # noqa: E402
 def pytest_sessionstart():
     os.system("alembic downgrade base")
     os.system("alembic upgrade head")
+    if not os.path.exists("./modules"):
+        shutil.copytree("./source/modules", "./modules")
 
 
 @pytest.fixture(scope="function")

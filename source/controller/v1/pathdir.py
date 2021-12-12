@@ -5,6 +5,7 @@ import hashlib
 import os
 import shutil
 import tarfile
+import zipfile
 
 import requests
 from loguru import logger
@@ -34,6 +35,30 @@ def extract_data_from_tar(tar_path: str, target_dir: str) -> str:
     for file in files:
         if os.path.isfile(file):
             shutil.move(file, dst)
+
+    os.system(f"rm -r {tmp_dir}")
+
+    return target_dir
+
+
+def extract_data_from_zip(zip_path: str, target_dir: str) -> str:
+    tmp_dir = f"/tmp/{hashlib.md5(datetime.datetime.now().strftime('%d-%m-%Y %H-%M').encode()).hexdigest()}"
+
+    with zipfile.ZipFile(zip_path, "r") as zip_file:
+        zip_file.extractall(tmp_dir)
+
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+    else:
+        os.system(f"rm -r {target_dir}")
+        os.makedirs(target_dir)
+
+    tmp_path = tmp_dir + "/" + os.listdir(tmp_dir)[0]
+
+    files = glob.iglob(os.path.join(tmp_path, "*"))
+    for file in files:
+        if os.path.isfile(file):
+            shutil.move(file, target_dir)
 
     os.system(f"rm -r {tmp_dir}")
 

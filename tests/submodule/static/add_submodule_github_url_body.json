@@ -1,0 +1,5 @@
+{
+    "submodule_name": "test_add_submodule_by_github_url",
+    "tag": "0.1",
+    "github_url": "https://github.com/RestBasePlatform/TestModule/archive/refs/heads/master.zip"
+}
